@@ -885,10 +885,35 @@
       <p class="footer-copy">❤️ 祝 2026 级 XISUer 开学顺利，前程似锦！</p>
     </div>
   </div>
+
+  <div class="footer-stats">
+    <span class="fs-item">👀 本站浏览量：<b id="busuanzi_value_site_pv">统计加载中…</b> 次</span>
+    <span class="fs-item">🧑‍🤝‍🧑 访客数：<b id="busuanzi_value_site_uv">统计加载中…</b> 人</span>
+    <span class="fs-item">📈 今日访问：<b id="busuanzi_value_page_pv">统计加载中…</b> 次</span>
+    <span class="fs-item">💚 计数由不蒜子免费提供</span>
+  </div>
 </footer>
 
 <button class="back-top" id="back-top" title="回到顶部" aria-label="回到顶部">↑</button>
 
 <script src="assets/js/app.js"></script>
+
+<!-- 不蒜子访问统计（免费静态站计数服务） -->
+<script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<script>
+  /* 统计兜底：若统计服务 8 秒内未返回数字，占位文案改为 "—" */
+  (function () {
+    var ids = ['busuanzi_value_site_pv', 'busuanzi_value_site_uv', 'busuanzi_value_page_pv'];
+    var HOLDER = '统计加载中…';
+    function finalize() {
+      ids.forEach(function (id) {
+        var el = document.getElementById(id);
+        if (el && el.textContent.indexOf(HOLDER) !== -1) el.textContent = '—';
+      });
+    }
+    setTimeout(finalize, 8000);
+    window.addEventListener('load', function () { setTimeout(finalize, 5000); });
+  })();
+</script>
 </body>
 </html>
