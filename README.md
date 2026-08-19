@@ -26,10 +26,14 @@
 ```
 xisu-guide/
 ├── index.html             # 主页面（所有内容都在这里，方便直接修改）
+├── manifest.webmanifest   # PWA 清单（手机"添加到主屏幕"）
+├── 404.html               # 自定义 404 页面
+├── sitemap.xml            # 站点地图（SEO）
+├── robots.txt             # 爬虫规则（SEO）
 └── assets/
-    ├── css/style.css      # 样式（西外红主题，可改 :root 中的配色变量）
+    ├── css/style.css      # 样式（西外红主题 + 打印样式，改 :root 配色变量即可换肤）
     ├── js/app.js          # 交互脚本 + 必备清单数据（CHECKLIST 数组）
-    └── img/campus-map.jpg # 长安校区地图
+    └── img/               # campus-map.webp 地图、og-share.png 分享图、图标 PNG 等
 ```
 
 ## 修改内容
