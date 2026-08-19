@@ -615,6 +615,45 @@ tbody tr:nth-child(even) { background: #fdf7f3; }
 }
 .fs-item:last-child { opacity: .7; font-size: 12.5px; }
 
+/* ---------------- 打印样式 ---------------- */
+@media print {
+  @page { margin: 1.2cm; }
+  html { scroll-behavior: auto; }
+  body { background: #fff !important; font-size: 12px; line-height: 1.6; }
+  /* 隐藏交互元素 */
+  .topbar, .back-top, .hero-actions, .hero-badge, .hero-chips,
+  .cl-actions, .footer-stats, .back-top, .back-top.show { display: none !important; }
+  .reveal { opacity: 1 !important; transform: none !important; }
+  /* 首屏降级为黑白 */
+  .hero { background: #fff !important; color: #222 !important; padding: 16px 0 8px; }
+  .hero-title { color: #222 !important; text-shadow: none !important; }
+  .hero-title span { background: none !important; -webkit-background-clip: initial !important; background-clip: initial !important; color: #c8102e !important; }
+  .hero-sub, .hero-chip { color: #444 !important; opacity: 1 !important; }
+  .hero-stats { grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 12px; }
+  .stat { background: #f5f5f5 !important; border: 1px solid #ddd !important; padding: 8px 6px; }
+  .stat b { color: #c8102e !important; font-size: 20px; }
+  /* 版式 */
+  main { max-width: 100%; padding: 0; }
+  .section { padding: 14px 0 0; border-top: none; }
+  .section + .section { border-top: 1px solid #ddd; margin-top: 10px; }
+  .section-head h2 { font-size: 20px; }
+  .section-icon { width: 40px; height: 40px; font-size: 20px; border-radius: 12px; box-shadow: none; }
+  .card { box-shadow: none !important; border: 1px solid #ddd; border-radius: 8px; padding: 14px; margin-bottom: 10px; break-inside: avoid; }
+  .sub-title { margin: 16px 0 8px; font-size: 16px; }
+  .tip, .warn-box { break-inside: avoid; }
+  /* 清单：勾选状态保留颜色 */
+  .cl-item label, .cl-item input:checked + label { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .cl-group { break-inside: avoid; }
+  .cl-group-head { box-shadow: none; }
+  .cl-items { grid-template-columns: repeat(2, 1fr); }
+  .checklist-summary { border-width: 1px; }
+  .footer { background: #fff !important; color: #444 !important; margin-top: 24px; }
+  .footer-note { opacity: 1; }
+  .footer-note b, .footer-copy { color: #c8102e !important; }
+  .footer-brand b { color: #222 !important; }
+  a { color: #c8102e !important; text-decoration: none; }
+}
+
 /* ---------------- 滚动渐入动画 ---------------- */
 .reveal { opacity: 0; transform: translateY(16px); transition: opacity .55s ease, transform .55s ease; }
 .reveal.in { opacity: 1; transform: none; }

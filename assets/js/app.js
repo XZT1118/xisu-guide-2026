@@ -245,5 +245,15 @@
     renderChecklist();
   });
 
+  /* 打印清单按钮 */
+  document.getElementById('cl-print').addEventListener('click', function () {
+    window.print();
+  });
+
+  /* 打印前自动展开所有折叠内容，便于打印完整内容 */
+  window.addEventListener('beforeprint', function () {
+    document.querySelectorAll('details.acc').forEach(function (d) { d.setAttribute('open', ''); });
+  });
+
   renderChecklist();
 })();
