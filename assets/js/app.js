@@ -245,12 +245,163 @@
     renderChecklist();
   });
 
-  /* 打印清单按钮 */
-  document.getElementById('cl-print').addEventListener('click', function () {
-    window.print();
+  /* ================= 清单多格式下载 ================= */
+  var fmtSel = document.getElementById('cl-format');
+  var dlBtn = document.getElementById('cl-download');
+  var TODAY = new Date().toISOString().slice(0, 10);
+
+  function isChecked(id) { return checked.indexOf(id) !== -1; }
+  function fileBase() { return '西外新生通关宝典-必备清单-' + TODAY; }
+
+  function downloadBlob(filename, blob) {
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function () { document.body.removeChild(a); URL.revokeObjectURL(url); }, 400);
+  }
+  function downloadText(filename, content, mime) {
+    downloadBlob(filename, new Blob([content], { type: (mime || 'text/plain') + ';charset=utf-8' }));
+  }
+
+  function mdContent() {
+    var out = ['# 🎒 开学必备清单（西安外国语大学 · 2026 新生通关宝典）', '',
+      '> 生成时间：' + new Date().toLocaleString('zh-CN'),
+      '> 来源：https://xzt1118.github.io/xisu-guide-2026/', ''];
+    CHECKLIST.forEach(function (g) {
+      out.push('## ' + g.emoji + ' ' + g.name, '');
+      g.items.forEach(function (it) {
+        out.push((isChecked(it.id) ? '- [x] ' : '- [ ] ') + it.text + (it.note ? '　' + it.note : ''));
+      });
+      out.push('');
+    });
+    return out.join('\n');
+  }
+
+  function csvContent() {
+    var rows = [['分类', '物品', '备注', '是否准备']];
+    CHECKLIST.forEach(function (g) {
+      g.items.forEach(function (it) {
+        rows.push([g.name, it.text, it.note || '', isChecked(it.id) ? '是' : '否']);
+      });
+    });
+    /* \ufeff BOM 保证 Excel 打开中文不乱码 */
+    return '\ufeff' + rows.map(function (r) {
+      return r.map(function (c) {
+        var s = String(c).replace(/"/g, '""');
+        return /[",\n]/.test(s) ? '"' + s + '"' : s;
+      }).join(',');
+    }).join('\r\n');
+  }
+
+  function jsonContent() {
+    return JSON.stringify({
+      app: '西外新生通关宝典', exportAt: new Date().toISOString(),
+      url: 'https://xzt1118.github.io/xisu-guide-2026/', checked: checked
+    }, null, 2);
+  }
+
+  function htmlContent() {
+    var body = [];
+    CHECKLIST.forEach(function (g) {
+      body.push('<h2>' + g.emoji + ' ' + g.name + '</h2><ul>');
+      g.items.forEach(function (it) {
+        var done = isChecked(it.id);
+        body.push('<li class="' + (done ? 'ok' : '') + '">' + (done ? '✓ ' : '☐ ') + it.text +
+          (it.note ? ' <small>' + it.note + '</small>' : '') + '</li>');
+      });
+      body.push('</ul>');
+    });
+    return '<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8">' +
+      '<meta name="viewport" content="width=device-width,initial-scale=1"><title>开学必备清单</title>' +
+      '<style>body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;max-width:640px;margin:0 auto;padding:24px;color:#333}' +
+      'h1{color:#c8102e}h2{color:#9e0c24;font-size:18px;margin-top:22px}ul{list-style:none;padding:0}' +
+      'li{padding:6px 0;border-bottom:1px dashed #eee}.ok{color:#2f9e63;font-weight:700}small{color:#999}' +
+      '@media print{li{break-inside:avoid}}</style></head><body>' +
+      '<h1>🎒 开学必备清单</h1><p>西安外国语大学 · 2026 新生通关宝典 ｜ ' + new Date().toLocaleString('zh-CN') + '</p>' +
+      body.join('') + '<p style="color:#999;margin-top:24px">来源：https://xzt1118.github.io/xisu-guide-2026/</p>' +
+      '</body></html>';
+  }
+
+  /* 清单渲染为 PNG 图片 */
+  function pngBlob(cb) {
+    var pad = 32, lineH = 30, headH = 96, catH = 44;
+    var itemTotal = flattenItems().length;
+    var width = 780;
+    var height = headH + 20 + CHECKLIST.length * (catH + 8) + itemTotal * lineH + 40;
+    var canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    var ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, width, height);
+    var grad = ctx.createLinearGradient(0, 0, 0, headH);
+    grad.addColorStop(0, '#9e0c24');
+    grad.addColorStop(1, '#c8102e');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, width, headH);
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 30px "Microsoft YaHei","PingFang SC",sans-serif';
+    ctx.fillText('🎒 开学必备清单', pad, 42);
+    ctx.font = '15px "Microsoft YaHei","PingFang SC",sans-serif';
+    ctx.fillStyle = '#f4d9a8';
+    ctx.fillText('西安外国语大学 · 2026 新生通关宝典', pad, 74);
+    var y = headH + 18;
+    CHECKLIST.forEach(function (g) {
+      ctx.fillStyle = '#fdeef0';
+      ctx.fillRect(pad, y - 20, width - pad * 2, catH);
+      ctx.fillStyle = '#c8102e';
+      ctx.font = 'bold 18px "Microsoft YaHei","PingFang SC",sans-serif';
+      ctx.fillText(g.emoji + ' ' + g.name, pad + 12, y + 2);
+      y += catH;
+      g.items.forEach(function (it) {
+        var done = isChecked(it.id);
+        ctx.fillStyle = done ? '#2f9e63' : '#444';
+        ctx.font = (done ? 'bold ' : '') + '16px "Microsoft YaHei","PingFang SC",sans-serif';
+        var label = (done ? '✓ ' : '☐ ') + it.text;
+        ctx.fillText(label, pad + 24, y);
+        if (it.note) {
+          ctx.fillStyle = '#999';
+          ctx.font = '13px "Microsoft YaHei","PingFang SC",sans-serif';
+          ctx.fillText(it.note, pad + 24 + ctx.measureText(label).width + 18, y);
+        }
+        y += lineH;
+      });
+      y += 8;
+    });
+    canvas.toBlob(function (blob) { cb(blob); }, 'image/png');
+  }
+
+  dlBtn.addEventListener('click', function () {
+    var fmt = fmtSel.value;
+    var base = fileBase();
+    if (fmt === 'txt') {
+      var lines = [];
+      CHECKLIST.forEach(function (g) {
+        lines.push('【' + g.emoji + ' ' + g.name + '】');
+        g.items.forEach(function (it) {
+          lines.push((isChecked(it.id) ? '☑ ' : '☐ ') + it.text + (it.note ? '（' + it.note + '）' : ''));
+        });
+        lines.push('');
+      });
+      downloadText(base + '.txt', lines.join('\n'), 'text/plain');
+    } else if (fmt === 'md') {
+      downloadText(base + '.md', mdContent(), 'text/markdown');
+    } else if (fmt === 'csv') {
+      downloadText(base + '.csv', csvContent(), 'text/csv');
+    } else if (fmt === 'json') {
+      downloadText(base + '.json', jsonContent(), 'application/json');
+    } else if (fmt === 'html') {
+      downloadText(base + '.html', htmlContent(), 'text/html');
+    } else if (fmt === 'png') {
+      pngBlob(function (blob) { downloadBlob(base + '.png', blob); });
+    }
   });
 
-  /* 打印前自动展开所有折叠内容，便于打印完整内容 */
+  /* 打印前自动展开所有折叠内容，便于浏览器打印完整内容 */
   window.addEventListener('beforeprint', function () {
     document.querySelectorAll('details.acc').forEach(function (d) { d.setAttribute('open', ''); });
   });

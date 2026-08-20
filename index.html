@@ -523,7 +523,7 @@
     <div>
       <span class="section-kicker">模块 06</span>
       <h2>开学必备清单</h2>
-      <p class="section-desc">勾选进度自动保存在本机浏览器，关掉页面再打开也不会丢 ✅</p>
+      <p class="section-desc">勾选进度自动保存在本机浏览器；还支持一键下载为文本 / Markdown / 表格 / 图片等格式 ✅</p>
     </div>
   </div>
 
@@ -536,7 +536,15 @@
       </div>
     </div>
     <div class="cl-actions">
-      <button class="btn btn-red btn-sm" id="cl-print" type="button">🖨️ 打印清单</button>
+      <select id="cl-format" class="cl-select" aria-label="选择下载格式">
+        <option value="txt">📄 文本 (.txt)</option>
+        <option value="md">📝 Markdown (.md)</option>
+        <option value="csv">📊 表格 (.csv)</option>
+        <option value="png">🖼️ 图片 (.png)</option>
+        <option value="json">💾 进度备份 (.json)</option>
+        <option value="html">🌐 网页文件 (.html)</option>
+      </select>
+      <button class="btn btn-red btn-sm" id="cl-download" type="button">⬇️ 下载清单</button>
       <button class="btn btn-red btn-sm" id="cl-reset" type="button">🗑️ 重置进度</button>
     </div>
   </div>

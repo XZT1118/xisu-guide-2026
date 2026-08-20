@@ -482,6 +482,23 @@ tbody tr:nth-child(even) { background: #fdf7f3; }
 .cl-overall-title { font-weight: 800; font-size: 17px; color: var(--red-dark); }
 .cl-overall-sub { color: var(--ink-soft); font-size: 14px; }
 
+.cl-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.cl-select {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 2px solid var(--red);
+  border-radius: 999px;
+  background: #fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' fill='none' stroke='%23c8102e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/></svg>") no-repeat right 14px center;
+  color: var(--red-dark);
+  font-size: 14px;
+  font-weight: 700;
+  font-family: inherit;
+  padding: 9px 36px 9px 18px;
+  cursor: pointer;
+  max-width: 100%;
+}
+.cl-select:focus { outline: 2px solid rgba(200, 16, 46, .35); outline-offset: 1px; }
+
 .cl-group { margin-bottom: 16px; }
 .cl-group-head {
   display: flex;
