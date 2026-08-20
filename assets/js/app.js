@@ -13,16 +13,34 @@
     .map(function (a) { return document.querySelector(a.getAttribute('href')); })
     .filter(Boolean);
 
+  /* 已读模块追踪（localStorage 持久化，呼应"闯关"概念） */
+  var VIEW_KEY = 'xisu2026-viewed';
+  var viewed = [];
+  try { viewed = JSON.parse(localStorage.getItem(VIEW_KEY) || '[]'); } catch (e) { viewed = []; }
+  function saveViewed() { try { localStorage.setItem(VIEW_KEY, JSON.stringify(viewed)); } catch (e) {} }
+  function markViewed(sec) {
+    if (viewed.indexOf(sec) === -1) { viewed.push(sec); saveViewed(); }
+    var chip = nav.querySelector('[data-sec="' + sec + '"]');
+    var done = chip ? chip.querySelector('.chip-done') : null;
+    if (done) done.hidden = false;
+  }
+
   var sectionObserver = new IntersectionObserver(function (entries) {
     entries.forEach(function (entry) {
       if (!entry.isIntersecting) return;
-      var id = '#' + entry.target.id;
+      var sec = entry.target.id;
+      var id = '#' + sec;
       navChips.forEach(function (chip) {
         chip.classList.toggle('active', chip.getAttribute('href') === id);
       });
+      document.querySelectorAll('.toc-dot').forEach(function (d) {
+        d.classList.toggle('active', d.getAttribute('data-sec') === sec);
+      });
+      markViewed(sec);
     });
   }, { rootMargin: '-30% 0px -60% 0px', threshold: 0 });
   sections.forEach(function (s) { sectionObserver.observe(s); });
+  viewed.forEach(markViewed);
 
   /* ---------------- 回到顶部 ---------------- */
   var backTop = document.getElementById('back-top');
@@ -41,7 +59,12 @@
   if (reduceMotion || !('IntersectionObserver' in window)) {
     revealTargets.forEach(function (el) { el.classList.add('in'); });
   } else {
-    revealTargets.forEach(function (el) { el.classList.add('reveal'); });
+    revealTargets.forEach(function (el) {
+      el.classList.add('reveal');
+      var idx = 0, sib = el;
+      while ((sib = sib.previousElementSibling)) idx++;
+      el.style.setProperty('--i', Math.min(idx % 6, 5));
+    });
     var revealObserver = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
         if (entry.isIntersecting) {
@@ -51,6 +74,189 @@
       });
     }, { rootMargin: '0px 0px -8% 0px', threshold: 0.05 });
     revealTargets.forEach(function (el) { revealObserver.observe(el); });
+  }
+
+  /* ============ 2026 视觉升级交互 ============ */
+
+  /* 标题逐字入场 */
+  var heroTitle = document.querySelector('.hero-title');
+  if (heroTitle) {
+    var charEls = [];
+    Array.prototype.forEach.call(heroTitle.childNodes, function (node) {
+      if (node.nodeType === 3 && node.nodeValue.trim()) {
+        var frag = document.createDocumentFragment();
+        for (var i = 0; i < node.nodeValue.length; i++) {
+          var sp = document.createElement('span');
+          sp.className = 'char';
+          sp.textContent = node.nodeValue.charAt(i);
+          frag.appendChild(sp);
+          charEls.push(sp);
+        }
+        node.parentNode.replaceChild(frag, node);
+      } else if (node.nodeType === 1 && node.tagName === 'SPAN') {
+        var txt = node.textContent;
+        node.textContent = '';
+        var frag2 = document.createDocumentFragment();
+        for (var j = 0; j < txt.length; j++) {
+          var sp2 = document.createElement('span');
+          sp2.className = 'char accent';
+          sp2.textContent = txt.charAt(j);
+          frag2.appendChild(sp2);
+          charEls.push(sp2);
+        }
+        node.appendChild(frag2);
+      }
+    });
+    charEls.forEach(function (c, i) { c.style.setProperty('--i', i); });
+  }
+
+  /* 报到倒计时 */
+  var countdownEl = document.getElementById('hero-countdown');
+  if (countdownEl) {
+    var targetTs = new Date('2026-09-10T00:00:00+08:00').getTime();
+    var diff = targetTs - Date.now();
+    if (diff > 0) {
+      countdownEl.textContent = '⏳ 距 9 月 10 日报到还有 ' + Math.ceil(diff / 86400000) + ' 天';
+    } else if (diff > -2 * 86400000) {
+      countdownEl.textContent = '📢 报到进行中（9 月 10 日—11 日）';
+    } else {
+      countdownEl.textContent = '🎉 新学期已开始，祝顺利！';
+    }
+  }
+
+  /* 统计数据数字滚动 */
+  var heroStats = document.querySelector('.hero-stats');
+  var statEls = heroStats ? heroStats.querySelectorAll('[data-count]') : [];
+  function animateStat(el) {
+    var target = parseInt(el.getAttribute('data-count'), 10) || 0;
+    if (reduceMotion || !('requestAnimationFrame' in window)) { el.textContent = target; return; }
+    var start = null, dur = 900;
+    function step(t) {
+      if (!start) start = t;
+      var p = Math.min(1, (t - start) / dur);
+      el.textContent = Math.round(target * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+  if (heroStats && statEls.length) {
+    if (!reduceMotion && 'IntersectionObserver' in window) {
+      var statsObs = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) {
+            Array.prototype.forEach.call(statEls, animateStat);
+            statsObs.disconnect();
+          }
+        });
+      }, { threshold: 0.4 });
+      statsObs.observe(heroStats);
+    } else {
+      Array.prototype.forEach.call(statEls, function (el) { el.textContent = el.getAttribute('data-count'); });
+    }
+  }
+
+  /* 阅读进度条 */
+  var readBar = document.getElementById('read-bar');
+  var readTicking = false;
+  function updateReadBar() {
+    var max = document.documentElement.scrollHeight - window.innerHeight;
+    var p = max > 0 ? Math.min(100, Math.max(0, window.scrollY / max * 100)) : 0;
+    readBar.style.width = p + '%';
+    readTicking = false;
+  }
+  window.addEventListener('scroll', function () {
+    if (!readTicking) { readTicking = true; requestAnimationFrame(updateReadBar); }
+  }, { passive: true });
+  updateReadBar();
+
+  /* 移动端抽屉导航 */
+  var navToggle = document.getElementById('nav-toggle');
+  var navBackdrop = document.getElementById('nav-backdrop');
+  function closeNav() {
+    nav.classList.remove('open');
+    navBackdrop.hidden = true;
+    navToggle.setAttribute('aria-expanded', 'false');
+  }
+  navToggle.addEventListener('click', function () {
+    var open = navEl.classList.toggle('open');
+    navBackdrop.hidden = !open;
+    navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  navBackdrop.addEventListener('click', closeNav);
+  navChips.forEach(function (chip) { chip.addEventListener('click', closeNav); });
+
+  /* 暗色模式：系统偏好 + 手动切换（localStorage 持久化） */
+  var themeToggle = document.getElementById('theme-toggle');
+  var THEME_KEY = 'xisu2026-theme';
+  function applyTheme(t) {
+    document.documentElement.setAttribute('data-theme', t);
+    themeToggle.setAttribute('aria-pressed', t === 'dark' ? 'true' : 'false');
+    var mc = document.querySelector('meta[name="theme-color"]');
+    if (mc) mc.setAttribute('content', t === 'dark' ? '#221c29' : '#c8102e');
+  }
+  (function initTheme() {
+    var saved = null;
+    try { saved = localStorage.getItem(THEME_KEY); } catch (e) {}
+    var t = (saved === 'dark' || saved === 'light')
+      ? saved
+      : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    applyTheme(t);
+  })();
+  themeToggle.addEventListener('click', function () {
+    var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    applyTheme(next);
+    try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
+  });
+
+  /* 清单 100% 撒花庆祝（手写 canvas，轻量） */
+  function fireConfetti() {
+    if (reduceMotion) return;
+    var canvas = document.getElementById('confetti-canvas');
+    if (!canvas) {
+      canvas = document.createElement('canvas');
+      canvas.id = 'confetti-canvas';
+      document.body.appendChild(canvas);
+    }
+    var W = canvas.width = window.innerWidth;
+    var H = canvas.height = window.innerHeight;
+    var ctx = canvas.getContext('2d');
+    var colors = ['#c8102e', '#f4b83e', '#2f9e63', '#2a6cb8', '#ff8195', '#ffe08a'];
+    var parts = [];
+    for (var i = 0; i < 90; i++) {
+      parts.push({
+        x: W / 2 + (Math.random() - 0.5) * W * 0.7,
+        y: H * 0.25 + (Math.random() - 0.5) * H * 0.3,
+        w: 6 + Math.random() * 6,
+        h: 8 + Math.random() * 8,
+        vx: (Math.random() - 0.5) * 3.2,
+        vy: -(2 + Math.random() * 4),
+        rot: Math.random() * Math.PI * 2,
+        vr: (Math.random() - 0.5) * 0.25,
+        color: colors[i % colors.length]
+      });
+    }
+    var start = null, DURATION = 1600;
+    function frame(t) {
+      if (!start) start = t;
+      var el = Math.min(1, (t - start) / DURATION);
+      ctx.clearRect(0, 0, W, H);
+      parts.forEach(function (p) {
+        p.vy += 0.22;
+        p.x += p.vx;
+        p.y += p.vy;
+        p.rot += p.vr;
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        ctx.globalAlpha = Math.max(0, 1 - el);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+        ctx.restore();
+      });
+      if (el < 1) requestAnimationFrame(frame);
+      else ctx.clearRect(0, 0, W, H);
+    }
+    requestAnimationFrame(frame);
   }
 
   /* ================= 开学必备清单 ================= */
@@ -146,6 +352,7 @@
   var percentEl = document.getElementById('cl-percent');
   var countEl = document.getElementById('cl-count');
   var navProgressEl = document.getElementById('nav-progress');
+  var celebrated = false;
 
   /* 读取已保存进度 */
   function loadChecked() {
@@ -177,6 +384,8 @@
     var done = checked.length;
     var total = all.length;
     var pct = total ? Math.round(done / total * 100) : 0;
+    if (pct === 100 && !celebrated && total > 0) { celebrated = true; fireConfetti(); }
+    if (pct < 100) { celebrated = false; }
     ringEl.style.setProperty('--p', pct + '%');
     percentEl.textContent = pct + '%';
     countEl.textContent = '已准备 ' + done + ' / ' + total + ' 项';
@@ -195,14 +404,15 @@
 
   function renderChecklist() {
     groupsEl.innerHTML = '';
-    CHECKLIST.forEach(function (g) {
+    CHECKLIST.forEach(function (g, gi) {
       var group = document.createElement('div');
       group.className = 'cl-group';
 
       var head = document.createElement('div');
       head.className = 'cl-group-head';
+      var orb = ['red', 'gold', 'green', 'blue'][gi % 4];
       head.innerHTML =
-        '<span class="cl-group-emoji">' + g.emoji + '</span>' +
+        '<span class="cl-group-emoji emoji-orb orb-' + orb + '">' + g.emoji + '</span>' +
         '<span class="cl-group-name">' + g.name + '</span>' +
         '<span class="cl-group-count" data-count="' + g.id + '">0/' + g.items.length + '</span>' +
         '<span class="cl-group-bar"><i data-bar="' + g.id + '"></i></span>';
