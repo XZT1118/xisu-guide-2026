@@ -725,7 +725,7 @@ tbody tr:nth-child(even) { background: #fdf7f3; }
 
 /* ---------- 字体与主题变量 ---------- */
 :root {
-  --font-display: "ZCOOL QingKe HuangYou", "Microsoft YaHei", "PingFang SC", "Segoe UI", sans-serif;
+  --font-display: "Ma Shan Zheng", "Kaiti SC", "KaiTi", "Microsoft YaHei", "PingFang SC", "Segoe UI", sans-serif;
   --shadow: 0 6px 16px rgba(158, 12, 36, .06);
   --shadow-lg: 0 12px 32px rgba(158, 12, 36, .12);
 }
@@ -747,6 +747,19 @@ tbody tr:nth-child(even) { background: #fdf7f3; }
 .tl-body h4 {
   font-family: var(--font-display);
   letter-spacing: .5px;
+}
+/* 书法体在小字号下影响可读性：小标题回退系统字体 */
+.hero-countdown,
+.tl-body h4,
+.route-head,
+.contact-card b,
+.scam-card h4,
+.acc summary,
+.warn-title,
+.cl-group-name,
+.cl-overall-title {
+  font-family: inherit;
+  letter-spacing: normal;
 }
 .sub-title { font-weight: 700; }
 
