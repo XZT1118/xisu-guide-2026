@@ -23,6 +23,7 @@
     var chip = nav.querySelector('[data-sec="' + sec + '"]');
     var done = chip ? chip.querySelector('.chip-done') : null;
     if (done) done.hidden = false;
+    if (typeof updateQuest === 'function') updateQuest();
   }
 
   var sectionObserver = new IntersectionObserver(function (entries) {
@@ -400,6 +401,7 @@
       if (bar) bar.style.width = gPct + '%';
       if (count) count.textContent = gDone + '/' + g.items.length;
     });
+    if (typeof updateQuest === 'function') updateQuest();
   }
 
   function renderChecklist() {
@@ -615,6 +617,51 @@
   window.addEventListener('beforeprint', function () {
     document.querySelectorAll('details.acc').forEach(function (d) { d.setAttribute('open', ''); });
   });
+
+  /* ================= 闯关进度面板 ================= */
+  var questState = document.getElementById('quest-state');
+  var questModules = document.getElementById('quest-modules');
+  var questModulesNum = document.getElementById('quest-modules-num');
+  var questList = document.getElementById('quest-list');
+  var questListNum = document.getElementById('quest-list-num');
+  function updateQuest() {
+    var arr = checked || [];
+    var all = flattenItems();
+    var lpct = all.length ? Math.round(arr.length / all.length * 100) : 0;
+    var total = sections.length || 10;
+    var read = Math.min(viewed.length, total);
+    if (questModules) questModules.style.width = (read / total * 100) + '%';
+    if (questModulesNum) questModulesNum.textContent = read + ' / ' + total;
+    if (questList) questList.style.width = lpct + '%';
+    if (questListNum) questListNum.textContent = lpct + '%';
+    if (questState) {
+      if (read >= total && lpct >= 100) questState.textContent = '🏆 全通关！你就是最全的 XISUer 通关达人！';
+      else questState.textContent = '继续闯关：集齐 ' + total + ' 个模块 + 100% 清单即通关';
+    }
+  }
+
+  /* ================= 分享给同学 ================= */
+  var shareBtn = document.getElementById('share-btn');
+  if (shareBtn) {
+    var shareDefault = shareBtn.innerHTML;
+    var shareData = {
+      title: '西安外国语大学 · 2026 新生通关宝典',
+      text: '报到全攻略！30秒了解西外、宿舍食堂、报到流程、军训、升学、防骗，新生必备。',
+      url: 'https://xzt1118.github.io/xisu-guide-2026/'
+    };
+    shareBtn.addEventListener('click', function () {
+      if (navigator.share) {
+        navigator.share(shareData).catch(function () {});
+      } else if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(shareData.url).then(function () {
+          shareBtn.textContent = '链接已复制 ✓';
+          setTimeout(function () { shareBtn.innerHTML = shareDefault; }, 2000);
+        }, function () { window.prompt('复制链接', shareData.url); });
+      } else {
+        window.prompt('复制链接', shareData.url);
+      }
+    });
+  }
 
   renderChecklist();
 })();

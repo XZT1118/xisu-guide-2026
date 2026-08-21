@@ -132,6 +132,7 @@
     <div class="hero-actions">
       <a class="btn btn-gold" href="#know"><svg viewBox="0 0 24 24" class="ic"><path d="M5 12h14M13 6l6 6-6 6"/></svg>开始闯关</a>
       <a class="btn btn-ghost" href="#checklist"><svg viewBox="0 0 24 24" class="ic"><path d="m5 12 5 5 9-11"/></svg>打开必备清单</a>
+      <button class="btn btn-ghost" id="share-btn" type="button"><svg viewBox="0 0 24 24" class="ic"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M5 11v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9"/></svg>分享给同学</button>
     </div>
     <div class="hero-stats">
       <div class="stat"><b data-count="4">0</b><span>新中国最早建立的外语院校之一</span></div>
@@ -143,6 +144,29 @@
 </section>
 
 <main>
+
+<!-- ======================= 闯关进度总览 ======================= -->
+<div class="card quest-card" id="quest-card">
+  <div class="quest-head">
+    <span class="quest-emoji emoji-orb orb-gold">🏆</span>
+    <div class="quest-titles">
+      <b>闯关进度</b>
+      <span class="quest-state" id="quest-state">正在闯关中…</span>
+    </div>
+  </div>
+  <div class="quest-row">
+    <div class="quest-item">
+      <span class="quest-label">📖 已读模块</span>
+      <div class="quest-bar"><i id="quest-modules"></i></div>
+      <span class="quest-num" id="quest-modules-num">0 / 10</span>
+    </div>
+    <div class="quest-item">
+      <span class="quest-label">🎒 清单准备</span>
+      <div class="quest-bar"><i id="quest-list"></i></div>
+      <span class="quest-num" id="quest-list-num">0%</span>
+    </div>
+  </div>
+</div>
 
 <!-- ======================= 模块 01：30秒了解西外 ======================= -->
 <section class="section" id="know">

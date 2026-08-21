@@ -297,7 +297,7 @@ main { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
 .tag-cloud { display: flex; flex-wrap: wrap; gap: 10px; }
 .tag { border-radius: 999px; padding: 8px 16px; font-size: 14.5px; font-weight: 600; }
 .tag-red { background: var(--red-soft); color: var(--red-deep); border: 1px solid #f4c9cf; }
-.tag-soft { background: var(--gold-soft); color: #8a6110; border: 1px solid #f2dd9e; }
+.tag-soft { background: var(--gold-soft); color: #7a5208; border: 1px solid #ecd39a; }
 
 /* 提示条 */
 .tip {
@@ -586,7 +586,7 @@ tbody tr:nth-child(even) { background: #fdf7f3; }
 .dorm-card { border-top: 5px solid var(--red); }
 .dorm-detail { font-size: 14px; color: var(--ink-soft); }
 .dorm-detail b { color: var(--red-dark); }
-.src-note { margin-top: 10px; font-size: 12px; color: #b08a3a; font-style: italic; }
+.src-note { margin-top: 10px; font-size: 12px; color: #96702c; font-style: italic; }
 
 /* 防骗卡 */
 .scam-card { border-top: 5px solid var(--red); padding: 20px; }
@@ -672,7 +672,7 @@ tbody tr:nth-child(even) { background: #fdf7f3; }
 }
 
 /* ---------------- 滚动渐入动画 ---------------- */
-.reveal { opacity: 0; transform: translateY(16px); transition: opacity .55s ease, transform .55s ease; }
+.reveal { opacity: 0; transform: translateY(16px); transition: opacity .4s ease, transform .4s ease; }
 .reveal.in { opacity: 1; transform: none; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
@@ -887,7 +887,7 @@ tbody tr:nth-child(even) { background: #fdf7f3; }
 .stat b { font-variant-numeric: tabular-nums; }
 
 /* ---------- 卡片 stagger 渐入 ---------- */
-.reveal { transition-delay: calc(var(--i, 0) * 70ms); }
+.reveal { transition-delay: calc(var(--i, 0) * 40ms); }
 
 /* ---------- 导航芯片：已读标记 ---------- */
 .chip-done {
@@ -1030,7 +1030,7 @@ html[data-theme="dark"] .mini-card b,
 html[data-theme="dark"] .cl-note,
 html[data-theme="dark"] .tag-red { color: #ff8195; }
 html[data-theme="dark"] .tag-red { border-color: #6b3a44; }
-html[data-theme="dark"] .tag-soft { color: #e2bb6b; border-color: #6b5a2e; }
+html[data-theme="dark"] .tag-soft { color: #f0cd85; border-color: #6b5a2e; }
 html[data-theme="dark"] .section-head h2,
 html[data-theme="dark"] .sub-title,
 html[data-theme="dark"] .cl-group-name,
@@ -1055,7 +1055,7 @@ html[data-theme="dark"] .tip { background: #2b2416; border-color: #6b5a2e; }
 html[data-theme="dark"] .mini-card { background: #1d1823; border-color: #322a38; }
 html[data-theme="dark"] .link-item { background: #1d1823; border-color: #322a38; }
 html[data-theme="dark"] .link-item:hover { border-color: #ff8195; background: #3a1a20; }
-html[data-theme="dark"] .src-note { color: #c9a25e; }
+html[data-theme="dark"] .src-note { color: #d3ab66; }
 html[data-theme="dark"] .tl-body { background: #1d1823; border-color: #322a38; }
 html[data-theme="dark"] .toc-rail { background: var(--card); border-color: #322a38; }
 html[data-theme="dark"] .toc-dot { background: #453c50; }
@@ -1089,3 +1089,70 @@ html[data-theme="dark"] .nav-chip.active .chip-done { background: rgba(255,255,2
   .hero-title .char { opacity: 1; transform: none; animation: none; }
   .reveal { transition-delay: 0ms !important; }
 }
+
+/* ============================================================
+   2026 视觉升级（二）：章节感 / 印章 / 闯关面板 / 分享 / 暗色细节
+   ============================================================ */
+
+/* ---------- B1 模块色条：每个模块一个主题色，卡片顶部色条同色系 ---------- */
+.section { --sec-c: var(--red); }
+#campus { --sec-c: #2a6cb8; }
+#dorm { --sec-c: #1f7a4d; }
+#food { --sec-c: #c98a0b; }
+#checklist { --sec-c: #c98a0b; }
+#military { --sec-c: #1f7a4d; }
+#transfer { --sec-c: #2a6cb8; }
+#services { --sec-c: #c98a0b; }
+
+.section .card {
+  box-shadow: var(--shadow), inset 0 4px 0 var(--sec-c);
+}
+/* 旧版固定顶部色条由模块色条取代 */
+.route-card, .dorm-card, .scam-card, .contact-card { border-top: none; }
+/* 这些卡片保留各自强调，不叠加模块色条 */
+.checklist-summary, .intro-card, .tip-card, .warn-card {
+  box-shadow: var(--shadow);
+}
+/* 清单卡与提示框保留原有强调 */
+.checklist-summary { box-shadow: var(--shadow), inset 0 4px 0 var(--gold); }
+.intro-card { box-shadow: var(--shadow), inset 0 4px 0 var(--red); }
+
+/* ---------- A3 地图暗色适配 ---------- */
+html[data-theme="dark"] .map-figure img {
+  filter: brightness(.82) saturate(.86);
+  border: 1px solid #3a3340;
+}
+
+/* ---------- B2 关卡印章（模块标签） ---------- */
+.section-kicker {
+  font-family: var(--font-display);
+  background: linear-gradient(135deg, var(--gold), var(--gold-deep));
+  color: var(--red-dark);
+  border: 1px solid rgba(224, 156, 20, .5);
+  border-radius: 8px;
+  padding: 4px 12px;
+  letter-spacing: 2px;
+  transform: rotate(-2deg);
+  box-shadow: 0 2px 6px rgba(224, 156, 20, .3);
+}
+html[data-theme="dark"] .section-kicker { color: #6f0a1a; }
+@media (prefers-reduced-motion: reduce) { .section-kicker { transform: none; } }
+
+/* ---------- C1 闯关进度面板 ---------- */
+.quest-card { border: 1px solid var(--line); }
+.quest-head { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+.quest-emoji { font-size: 22px; }
+.quest-titles b { font-family: var(--font-display); font-size: 21px; color: var(--red-dark); }
+.quest-state { display: block; font-size: 13px; color: var(--ink-soft); margin-top: 2px; }
+.quest-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.quest-item { display: flex; align-items: center; gap: 12px; }
+.quest-label { font-size: 14px; color: var(--ink); white-space: nowrap; }
+.quest-bar { flex: 1; height: 10px; border-radius: 999px; background: var(--line); overflow: hidden; }
+.quest-bar i { display: block; height: 100%; width: 0; border-radius: 999px; transition: width .4s ease; }
+#quest-modules { background: linear-gradient(90deg, var(--red), #ff8195); }
+#quest-list { background: linear-gradient(90deg, var(--green), #6cc79a); }
+.quest-num { font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--red-dark); }
+html[data-theme="dark"] .quest-card { border-color: #322a38; }
+html[data-theme="dark"] .quest-titles b, html[data-theme="dark"] .quest-num { color: #ff8a9c; }
+html[data-theme="dark"] .quest-label { color: #cfc8d8; }
+@media (max-width: 760px) { .quest-row { grid-template-columns: 1fr; } .quest-emoji { font-size: 19px; } }
