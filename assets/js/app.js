@@ -41,7 +41,6 @@
     });
   }, { rootMargin: '-30% 0px -60% 0px', threshold: 0 });
   sections.forEach(function (s) { sectionObserver.observe(s); });
-  viewed.forEach(markViewed);
 
   /* ---------------- 回到顶部 ---------------- */
   var backTop = document.getElementById('back-top');
@@ -625,6 +624,7 @@
   var questList = document.getElementById('quest-list');
   var questListNum = document.getElementById('quest-list-num');
   function updateQuest() {
+    if (!CHECKLIST) return; /* 初始化早期（CHECKLIST 尚未赋值）时跳过 */
     var arr = checked || [];
     var all = flattenItems();
     var lpct = all.length ? Math.round(arr.length / all.length * 100) : 0;
@@ -662,6 +662,9 @@
       }
     });
   }
+
+  /* 恢复已读模块标记（放在所有数据就绪之后，避免初始化早期 CHECKLIST 未赋值） */
+  viewed.forEach(markViewed);
 
   renderChecklist();
 })();

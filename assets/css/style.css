@@ -906,6 +906,7 @@ tbody tr:nth-child(even) { background: #fdf7f3; }
   font-weight: 900;
   line-height: 1;
 }
+.chip-done[hidden] { display: none; }
 .nav-chip.active .chip-done { background: rgba(0, 0, 0, .35); }
 
 /* ---------- 桌面端悬浮目录（TOC） ---------- */
