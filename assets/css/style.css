@@ -19,6 +19,7 @@
   --line: #f1e4e0;
   --green: #2f9e63;
   --green-soft: #e8f6ee;
+  --track: #ececec;
   --radius: 18px;
   --radius-sm: 12px;
   --shadow: 0 8px 24px rgba(158, 12, 36, .08);
@@ -51,12 +52,12 @@ ul { list-style: none; }
 }
 
 .topbar-inner {
-  max-width: 1200px;
+  max-width: 1260px;
   margin: 0 auto;
   padding: 10px 20px;
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 14px;
 }
 
 .brand { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
@@ -81,7 +82,7 @@ ul { list-style: none; }
 
 .nav {
   display: flex;
-  gap: 6px;
+  gap: 4px;
   overflow-x: auto;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
@@ -92,8 +93,8 @@ ul { list-style: none; }
 .nav-chip {
   flex-shrink: 0;
   color: #fff;
-  font-size: 13.5px;
-  padding: 7px 12px;
+  font-size: 13px;
+  padding: 7px 10px;
   border-radius: 999px;
   background: rgba(255, 255, 255, .12);
   transition: background .2s, color .2s, transform .15s;
@@ -461,13 +462,12 @@ tbody tr:nth-child(even) { background: #fdf7f3; }
   width: 92px;
   height: 92px;
   border-radius: 50%;
-  background: conic-gradient(var(--green) var(--p), #eee 0);
+  background: conic-gradient(var(--green) var(--p), var(--track) 0);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 }
-.cl-ring::before { content: ""; position: absolute; }
 .cl-ring span {
   background: #fff;
   width: 70px;
@@ -515,7 +515,7 @@ tbody tr:nth-child(even) { background: #fdf7f3; }
 .cl-group-emoji { font-size: 24px; }
 .cl-group-name { font-weight: 800; color: var(--red-dark); }
 .cl-group-count { font-size: 13px; color: var(--ink-soft); }
-.cl-group-bar { flex: 1; min-width: 120px; height: 8px; border-radius: 999px; background: #eee; overflow: hidden; }
+.cl-group-bar { flex: 1; min-width: 120px; height: 8px; border-radius: 999px; background: var(--track); overflow: hidden; }
 .cl-group-bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--green), #6cc79a); border-radius: 999px; transition: width .3s; }
 
 .cl-items {
@@ -1018,6 +1018,7 @@ html[data-theme="dark"] {
   --red-soft: #3a1a20;
   --gold-soft: #3a2e15;
   --green-soft: #16291f;
+  --track: #37303f;
   --shadow: 0 6px 18px rgba(0, 0, 0, .45);
   --shadow-lg: 0 14px 36px rgba(0, 0, 0, .55);
 }
@@ -1160,3 +1161,324 @@ html[data-theme="dark"] .quest-card { border-color: #322a38; }
 html[data-theme="dark"] .quest-titles b, html[data-theme="dark"] .quest-num { color: #ff8a9c; }
 html[data-theme="dark"] .quest-label { color: #cfc8d8; }
 @media (max-width: 760px) { .quest-row { grid-template-columns: 1fr; } .quest-emoji { font-size: 19px; } }
+
+/* ============================================================
+   2026 视觉升级（三）：暗色补齐 / 阅读呼吸感 / Hero 封面化 /
+   地图相框+放大 / 通关激励（金徽章·证书·抽屉进度）
+   ============================================================ */
+
+/* ---------- A1 暗色模式补漏：警示卡 / 清单下拉 / 图标彩底 ---------- */
+html[data-theme="dark"] .warn-card {
+  background: linear-gradient(180deg, #2b1519, #221c29);
+  border-color: #6b3a44;
+}
+html[data-theme="dark"] .warn-card .warn-title { color: #ff8195; }
+html[data-theme="dark"] .cl-select {
+  background-color: #221c29;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' fill='none' stroke='%23ff8195' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+  color: #ffb3bf;
+}
+html[data-theme="dark"] .icon-red { background: linear-gradient(135deg, #3a1a20, #2b1519); color: #ff8195; }
+html[data-theme="dark"] .icon-gold { background: linear-gradient(135deg, #3a2e15, #2b2416); color: #f0cd85; }
+html[data-theme="dark"] .icon-green { background: linear-gradient(135deg, #16291f, #10201a); color: #7ed3a5; }
+html[data-theme="dark"] .icon-blue { background: linear-gradient(135deg, #14243a, #101d30); color: #8db8ea; }
+html[data-theme="dark"] .orb-red { background: #3a1a20; }
+html[data-theme="dark"] .orb-gold { background: #3a2e15; }
+html[data-theme="dark"] .orb-green { background: #16291f; }
+html[data-theme="dark"] .orb-blue { background: #14243a; }
+html[data-theme="dark"] .place-emoji, html[data-theme="dark"] .mini-emoji,
+html[data-theme="dark"] .contact-emoji, html[data-theme="dark"] .fact-emoji {
+  background: linear-gradient(135deg, #3a1a20, #2b1d21);
+}
+html[data-theme="dark"] .fact-emoji { background: linear-gradient(135deg, #16291f, #12241c); }
+html[data-theme="dark"] .contact-emoji { background: linear-gradient(135deg, #3a2e15, #2b2416); }
+html[data-theme="dark"] .quest-emoji.orb-gold { background: #3a2e15; }
+
+/* ---------- D1 阅读呼吸感 ---------- */
+.card { padding: 28px; }
+.tick-list { gap: 14px; }
+.tick-list li { line-height: 1.75; }
+.tick-list li, .dorm-detail, .acc-body p, .tip-card > p { max-width: 44em; }
+@media (max-width: 760px) {
+  html { scroll-padding-top: 60px; }
+  .card { padding: 22px; }
+}
+
+/* 加粗导语（块级标题行）：模块 05/08 长条目改为「导语 + 正文」两级结构 */
+.li-lead, .lead-list li > b:first-child {
+  display: block;
+  font-size: 16px;
+  margin-bottom: 2px;
+}
+/* 警示条目：红左边 + 柔色底 */
+.tick-list .li-warn {
+  background: var(--red-soft);
+  border-left: 4px solid var(--red);
+  border-radius: 10px;
+  padding: 10px 14px 10px 40px;
+  margin-left: -6px;
+}
+/* 主题分组（模块 07 军训）：模块色小标题 + 虚线分隔 */
+.li-group { margin-top: 24px; }
+.li-group:first-child { margin-top: 0; }
+.li-group + .li-group { padding-top: 22px; border-top: 2px dashed var(--line); }
+.li-group-name {
+  font-weight: 800;
+  font-size: 16px;
+  color: var(--sec-c, var(--red-dark));
+  margin-bottom: 12px;
+}
+html[data-theme="dark"] .li-group-name { color: #7ed3a5; }
+
+/* ---------- B1 Hero 桌面端双栏封面（≥1024px，移动端保持单栏） ---------- */
+.hero-visual { display: none; }
+@media (min-width: 1024px) {
+  .hero { text-align: left; padding: 92px 48px 72px; }
+  .hero-inner {
+    max-width: 1160px;
+    display: grid;
+    grid-template-columns: minmax(0, 1.18fr) minmax(0, .82fr);
+    gap: 20px 48px;
+    align-items: center;
+  }
+  .hero-chips, .hero-actions { justify-content: flex-start; }
+  .hero-chip { padding: 5px 13px; font-size: 13px; }
+  .hero-stats { grid-column: 1 / -1; margin-top: 26px; }
+  .hero-visual { display: block; justify-self: center; animation: floaty 11s ease-in-out infinite; }
+}
+.hero-map-card {
+  position: relative;
+  max-width: 380px;
+  padding: 10px;
+  background: linear-gradient(180deg, #fffdf6, #f7eedd);
+  border-radius: 14px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, .35), 0 4px 14px rgba(0, 0, 0, .22);
+  transform: rotate(2deg);
+}
+.hero-map-card img { border-radius: 8px; max-height: 430px; width: auto; margin: 0 auto; }
+.hero-seal {
+  position: absolute;
+  top: -16px;
+  right: -14px;
+  font-family: var(--font-display);
+  font-size: 21px;
+  line-height: 1.25;
+  text-align: center;
+  letter-spacing: 2px;
+  color: var(--red-dark);
+  background: linear-gradient(135deg, var(--gold), var(--gold-deep));
+  border: 2px solid rgba(255, 255, 255, .75);
+  border-radius: 10px;
+  padding: 8px 10px;
+  transform: rotate(8deg);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, .3);
+}
+
+/* ---------- B2 地图相框（卷轴化）+ 放大提示 ---------- */
+.map-figure {
+  position: relative;
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 14px 14px 8px;
+  background: linear-gradient(180deg, #fdf9f0, #f5eddd);
+  border: 1px solid #dcc9a4;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow), inset 0 0 0 4px #fffdf6, inset 0 0 0 5px #e2d3b3;
+}
+.map-figure img {
+  max-height: 680px;
+  cursor: zoom-in;
+  transition: transform .2s ease-out, box-shadow .2s ease-out;
+}
+.map-figure img:hover { transform: scale(1.01); box-shadow: 0 10px 30px rgba(111, 10, 26, .18); }
+.map-figure figcaption { padding-bottom: 6px; }
+.map-figure::after {
+  content: "长安校区";
+  position: absolute;
+  top: 26px;
+  right: 26px;
+  font-family: var(--font-display);
+  font-size: 15px;
+  letter-spacing: 3px;
+  color: var(--red);
+  border: 2px solid rgba(200, 16, 46, .55);
+  border-radius: 8px;
+  padding: 4px 8px;
+  transform: rotate(6deg);
+  background: rgba(255, 253, 246, .82);
+  opacity: .9;
+  pointer-events: none;
+}
+.map-hint { display: block; margin-top: 6px; font-size: 12.5px; color: #96702c; }
+html[data-theme="dark"] .map-figure {
+  background: linear-gradient(180deg, #241d2b, #1d1723);
+  border-color: #3a3340;
+  box-shadow: var(--shadow), inset 0 0 0 4px #221c29, inset 0 0 0 5px #3a3340;
+}
+html[data-theme="dark"] .map-figure::after {
+  color: #ff8195;
+  border-color: rgba(255, 129, 149, .5);
+  background: rgba(23, 19, 26, .8);
+}
+html[data-theme="dark"] .map-hint { color: #d3ab66; }
+
+/* ---------- B3 地图大图遮罩（lightbox） ---------- */
+#map-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 390;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(23, 19, 26, .86);
+  cursor: zoom-out;
+}
+#map-lightbox[hidden] { display: none; }
+#map-lightbox img {
+  max-width: min(94vw, 860px);
+  max-height: 90vh;
+  width: auto;
+  border-radius: 10px;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, .55);
+  animation: lbPop .22s ease-out;
+}
+#lb-close {
+  position: fixed;
+  top: 16px;
+  right: 20px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, .5);
+  background: rgba(255, 255, 255, .12);
+  color: #fff;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+@keyframes lbPop { from { opacity: 0; transform: scale(.96); } to { opacity: 1; transform: scale(1); } }
+
+/* ---------- C1 已读徽章金色「通关」化 ---------- */
+.chip-done {
+  position: relative;
+  width: 16px;
+  height: 16px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-deep));
+  color: var(--red-dark);
+  box-shadow: 0 1px 4px rgba(224, 156, 20, .45);
+}
+.chip-done::before {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(244, 184, 62, .85), transparent 70%);
+  opacity: 0;
+  pointer-events: none;
+}
+body.all-done .chip-done::before { animation: badgePulse 2.2s ease-in-out infinite; }
+@keyframes badgePulse { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }
+.nav-chip.active .chip-done { box-shadow: none; }
+.toc-dot.done { background: var(--gold); }
+
+/* ---------- C2 通关证书（清单 100% 显示） ---------- */
+.cert-card { text-align: center; padding: 10px 28px 28px; }
+.cert-card:not([hidden]) { animation: certIn .5s ease-out; }
+@keyframes certIn { from { opacity: 0; transform: translateY(14px) scale(.98); } to { opacity: 1; transform: none; } }
+.cert-frame {
+  position: relative;
+  margin: 18px auto 20px;
+  max-width: 620px;
+  padding: 34px 24px 30px;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(244, 184, 62, .14), transparent 60%),
+    linear-gradient(180deg, #fffdf6, #fbf3e2);
+  border: 2px solid var(--gold);
+  outline: 1px solid var(--gold-deep);
+  outline-offset: -8px;
+  border-radius: var(--radius);
+}
+.cert-kicker {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: #c98a0b;
+  border: 1px solid rgba(201, 138, 11, .5);
+  border-radius: 999px;
+  padding: 3px 14px;
+  margin-bottom: 12px;
+}
+.cert-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 44px;
+  letter-spacing: 8px;
+  color: var(--red-dark);
+}
+.cert-line { margin-top: 12px; font-size: 15.5px; color: var(--ink); line-height: 1.9; }
+.cert-meta { margin-top: 12px; font-size: 13.5px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.cert-seal {
+  position: absolute;
+  right: 18px;
+  bottom: 16px;
+  font-family: var(--font-display);
+  font-size: 17px;
+  line-height: 1.3;
+  text-align: center;
+  letter-spacing: 2px;
+  color: var(--red);
+  border: 2px solid rgba(200, 16, 46, .6);
+  border-radius: 10px;
+  padding: 6px 8px;
+  transform: rotate(-8deg);
+  opacity: .85;
+}
+.cert-actions { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
+.cert-tip { font-size: 13px; color: var(--ink-soft); }
+html[data-theme="dark"] .cert-frame {
+  background: linear-gradient(180deg, #2b2416, #221c29);
+  border-color: #8a6d2e;
+  outline-color: #8a6d2e;
+}
+html[data-theme="dark"] .cert-kicker { color: #f0cd85; border-color: #6b5a2e; }
+html[data-theme="dark"] .cert-title { color: #ff8a9c; }
+html[data-theme="dark"] .cert-seal { color: #ff8195; border-color: rgba(255, 129, 149, .55); }
+
+/* ---------- C3 移动端抽屉顶部进度摘要 ---------- */
+.drawer-progress { display: none; }
+@media (max-width: 760px) {
+  .drawer-progress {
+    display: block;
+    background: linear-gradient(135deg, var(--red-soft), var(--gold-soft));
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    margin: 0 2px 14px;
+  }
+  .drawer-progress b { display: block; font-size: 14.5px; color: var(--red-dark); margin-bottom: 10px; }
+  .dp-row { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--ink-soft); }
+  .dp-row + .dp-row { margin-top: 8px; }
+  .dp-row span { white-space: nowrap; }
+  .dp-bar { flex: 1; height: 7px; border-radius: 999px; background: var(--track); overflow: hidden; }
+  .dp-bar i { display: block; height: 100%; width: 0; border-radius: 999px; transition: width .4s ease; }
+  #dp-modules { background: linear-gradient(90deg, var(--red), #ff8195); }
+  #dp-list { background: linear-gradient(90deg, var(--green), #6cc79a); }
+  .dp-row em { font-style: normal; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
+}
+
+/* ---------- 打印补充：隐藏本层新增交互/装饰元素 ---------- */
+@media print {
+  .hero-visual, #map-lightbox, .map-hint, #cert-save, .cert-tip, .drawer-progress { display: none !important; }
+  .map-figure img:hover, .hero-map-card { transform: none; box-shadow: none; }
+  .map-figure::after { display: none; }
+}
+
+/* ---------- 动效克制补充（本层新增动画） ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .hero-visual, #map-lightbox img, .cert-card:not([hidden]) { animation: none; }
+  body.all-done .chip-done::before { animation: none; }
+  .map-figure img { transition: none; }
+  .map-figure img:hover { transform: none; }
+}

@@ -23,6 +23,11 @@
     var chip = nav.querySelector('[data-sec="' + sec + '"]');
     var done = chip ? chip.querySelector('.chip-done') : null;
     if (done) done.hidden = false;
+    var dot = document.querySelector('.toc-dot[data-sec="' + sec + '"]');
+    if (dot) dot.classList.add('done');
+    if (sections.length && viewed.length >= sections.length) {
+      document.body.classList.add('all-done');
+    }
     if (typeof updateQuest === 'function') updateQuest();
   }
 
@@ -178,7 +183,7 @@
     navToggle.setAttribute('aria-expanded', 'false');
   }
   navToggle.addEventListener('click', function () {
-    var open = navEl.classList.toggle('open');
+    var open = nav.classList.toggle('open');
     navBackdrop.hidden = !open;
     navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
   });
@@ -623,6 +628,14 @@
   var questModulesNum = document.getElementById('quest-modules-num');
   var questList = document.getElementById('quest-list');
   var questListNum = document.getElementById('quest-list-num');
+  /* 移动端抽屉顶部进度摘要 */
+  var dpModules = document.getElementById('dp-modules');
+  var dpModulesNum = document.getElementById('dp-modules-num');
+  var dpList = document.getElementById('dp-list');
+  var dpListNum = document.getElementById('dp-list-num');
+  /* 通关证书 */
+  var certCard = document.getElementById('cert-card');
+  var certMeta = document.getElementById('cert-meta');
   function updateQuest() {
     if (!CHECKLIST) return; /* 初始化早期（CHECKLIST 尚未赋值）时跳过 */
     var arr = checked || [];
@@ -634,9 +647,29 @@
     if (questModulesNum) questModulesNum.textContent = read + ' / ' + total;
     if (questList) questList.style.width = lpct + '%';
     if (questListNum) questListNum.textContent = lpct + '%';
+    /* 抽屉进度摘要与面板同步 */
+    if (dpModules) dpModules.style.width = (read / total * 100) + '%';
+    if (dpModulesNum) dpModulesNum.textContent = read + ' / ' + total;
+    if (dpList) dpList.style.width = lpct + '%';
+    if (dpListNum) dpListNum.textContent = lpct + '%';
     if (questState) {
       if (read >= total && lpct >= 100) questState.textContent = '🏆 全通关！你就是最全的 XISUer 通关达人！';
       else questState.textContent = '继续闯关：集齐 ' + total + ' 个模块 + 100% 清单即通关';
+    }
+    /* 清单 100%：亮出通关证书 */
+    if (certCard) {
+      if (lpct >= 100) {
+        if (certCard.hidden) {
+          certCard.hidden = false;
+          if (certMeta) {
+            var d = new Date();
+            certMeta.textContent = all.length + ' / ' + all.length + ' 项全部备齐 · ' +
+              d.getFullYear() + ' 年 ' + (d.getMonth() + 1) + ' 月 ' + d.getDate() + ' 日认证';
+          }
+        }
+      } else {
+        certCard.hidden = true;
+      }
     }
   }
 
@@ -659,6 +692,110 @@
         }, function () { window.prompt('复制链接', shareData.url); });
       } else {
         window.prompt('复制链接', shareData.url);
+      }
+    });
+  }
+
+  /* ================= 地图点击放大（lightbox） ================= */
+  var mapImg = document.querySelector('.map-figure img');
+  if (mapImg) {
+    var lightbox = document.createElement('div');
+    lightbox.id = 'map-lightbox';
+    lightbox.hidden = true;
+    lightbox.setAttribute('role', 'dialog');
+    lightbox.setAttribute('aria-modal', 'true');
+    lightbox.setAttribute('aria-label', '校园地图大图');
+    var lbClose = document.createElement('button');
+    lbClose.id = 'lb-close';
+    lbClose.type = 'button';
+    lbClose.setAttribute('aria-label', '关闭大图');
+    lbClose.textContent = '×';
+    var lbImg = document.createElement('img');
+    lbImg.src = mapImg.currentSrc || mapImg.src;
+    lbImg.alt = '西安外国语大学长安校区地图（放大查看）';
+    lightbox.appendChild(lbClose);
+    lightbox.appendChild(lbImg);
+    document.body.appendChild(lightbox);
+    var closeLightbox = function () {
+      lightbox.hidden = true;
+      document.body.style.overflow = '';
+    };
+    mapImg.addEventListener('click', function () {
+      lightbox.hidden = false;
+      document.body.style.overflow = 'hidden';
+    });
+    lightbox.addEventListener('click', function (e) {
+      if (e.target === lightbox || e.target === lbClose) closeLightbox();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && !lightbox.hidden) closeLightbox();
+    });
+    window.addEventListener('beforeprint', closeLightbox);
+  }
+
+  /* ================= 通关证书图片保存 ================= */
+  var certSave = document.getElementById('cert-save');
+  if (certSave && certCard) {
+    certSave.addEventListener('click', function () {
+      var W = 900, H = 560;
+      var canvas = document.createElement('canvas');
+      canvas.width = W;
+      canvas.height = H;
+      var ctx = canvas.getContext('2d');
+      if (!ctx) { window.alert('当前浏览器不支持生成图片，可截图保存证书～'); return; }
+      /* 米色宣纸底 + 金色渐染 + 双线框 */
+      ctx.fillStyle = '#fbf3e2';
+      ctx.fillRect(0, 0, W, H);
+      var rg = ctx.createRadialGradient(W / 2, 0, 40, W / 2, 0, 420);
+      rg.addColorStop(0, 'rgba(244,184,62,.28)');
+      rg.addColorStop(1, 'rgba(244,184,62,0)');
+      ctx.fillStyle = rg;
+      ctx.fillRect(0, 0, W, H);
+      ctx.strokeStyle = '#f4b83e';
+      ctx.lineWidth = 6;
+      ctx.strokeRect(18, 18, W - 36, H - 36);
+      ctx.strokeStyle = '#e09c14';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(32, 32, W - 64, H - 64);
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#c98a0b';
+      ctx.font = '700 20px "Microsoft YaHei", sans-serif';
+      ctx.fillText('X I S U · 2 0 2 6', W / 2, 84);
+      ctx.fillStyle = '#6f0a1a';
+      ctx.font = '400 84px "Ma Shan Zheng", "KaiTi", "Microsoft YaHei", serif';
+      ctx.fillText('通 关 证 书', W / 2, 196);
+      ctx.fillStyle = '#33303c';
+      ctx.font = '400 24px "Microsoft YaHei", sans-serif';
+      ctx.fillText('恭喜！你已读完全部模块、备齐开学行囊', W / 2, 272);
+      ctx.fillText('正式获得「2026 级通关 XISUer」称号', W / 2, 312);
+      ctx.fillStyle = '#6b6675';
+      ctx.font = '400 20px "Microsoft YaHei", sans-serif';
+      var metaText = certMeta ? certMeta.textContent : '';
+      if (metaText) ctx.fillText(metaText, W / 2, 368);
+      /* 印章 */
+      ctx.strokeStyle = 'rgba(200,16,46,.75)';
+      ctx.lineWidth = 4;
+      ctx.strokeRect(W - 152, H - 152, 92, 92);
+      ctx.fillStyle = 'rgba(200,16,46,.85)';
+      ctx.font = '400 30px "Ma Shan Zheng", "KaiTi", serif';
+      ctx.fillText('通关', W - 106, H - 110);
+      ctx.fillText('认证', W - 106, H - 76);
+      ctx.fillStyle = '#9e0c24';
+      ctx.font = '700 18px "Microsoft YaHei", sans-serif';
+      ctx.fillText('西安外国语大学 · 新生通关宝典', W / 2, H - 52);
+      if (canvas.toBlob) {
+        canvas.toBlob(function (blob) {
+          var url = URL.createObjectURL(blob);
+          var a = document.createElement('a');
+          a.href = url;
+          a.download = '西外新生通关宝典-通关证书.png';
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          setTimeout(function () { URL.revokeObjectURL(url); }, 3000);
+        }, 'image/png');
+      } else {
+        window.alert('当前浏览器不支持直接导出，可截图保存证书～');
       }
     });
   }

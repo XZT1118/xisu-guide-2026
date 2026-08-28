@@ -1,7 +1,7 @@
 # 西安外国语大学 · 2026 新生通关宝典 — 开发说明文档（Agent 交接手册）
 
 > 本文档面向后续接手的任何 AI Agent / 开发者。**先读本文档再动手**，可以避免重复调研和破坏既有功能。
-> 最后更新：2026-08（对应 git 提交 `2b337b0`）
+> 最后更新：2026-08（视觉升级三：Hero 双栏封面 / 地图相框+放大 / 通关激励系统 / 暗色补齐 / 阅读呼吸感）
 
 ---
 
@@ -38,10 +38,10 @@
 
 ```
 xisu-guide/
-├── index.html                # 主页面（全部内容与结构，~1056 行）
+├── index.html                # 主页面（全部内容与结构，~1110 行；head 有"防闪白"内联主题脚本）
 ├── assets/
-│   ├── css/style.css         # 全站样式（~1160 行，含多段"追加层"）
-│   ├── js/app.js             # 全部交互逻辑（~670 行，单 IIFE）
+│   ├── css/style.css         # 全站样式（~1480 行，含多段"追加层"，末层为"2026 视觉升级（三）"）
+│   ├── js/app.js             # 全部交互逻辑（~810 行，单 IIFE）
 │   └── img/
 │       ├── campus-map.jpg    # 地图原图（196KB，保留备用）
 │       ├── campus-map.webp   # 线上使用的地图（62KB）
@@ -59,7 +59,7 @@ xisu-guide/
 
 - **零依赖**：无 npm、无 CDN 库（唯一外部资源是 Google Fonts 展示字体 + 不蒜子统计脚本）。
 - **纯原生 JS**：`app.js` 是一个大 IIFE（`(function(){ 'use strict'; ... })()`），所有状态在闭包内。
-- **CSS 分层**：`style.css` 由多段组成：基础主题 → 组件 → 打印 → **"2026 视觉升级（追加层）"** → **"2026 视觉升级（二）"**（追加在后，覆盖前面的同名规则）。修改样式时优先在追加层覆盖，避免大改。
+- **CSS 分层**：`style.css` 由多段组成：基础主题 → 组件 → 打印 → **"2026 视觉升级（追加层）"** → **"2026 视觉升级（二）"** → **"2026 视觉升级（三）"**（追加在后，覆盖前面的同名规则；第三层含暗色补漏/呼吸感/Hero 双栏/地图相框/lightbox/金徽章/证书/抽屉进度）。修改样式时优先在追加层覆盖，避免大改。
 - **无内联样式键**：动态样式用 CSS 变量（`--i` 动画延迟、`--p` 进度环、`--sec-c` 模块色）。
 - **字体栈**：
   - 展示字体（大标题）：`--font-display: "Ma Shan Zheng", "Kaiti SC", "KaiTi", "Microsoft YaHei", ...`（Google Fonts 加载，`display=swap`，不可用时回退系统字体）
@@ -164,7 +164,13 @@ xisu-guide/
 | 重置 | `cl-reset`，confirm 后清空 |
 | 打印 | `beforeprint` 展开全部 `details.acc`；`@media print` 规则在 style.css（隐藏交互元素、黑白降级、清单绿色保留 `print-color-adjust: exact`） |
 | 分享 | `share-btn`：`navigator.share` → 失败/不支持回退 `navigator.clipboard` → 再回退 `window.prompt`；复制成功按钮文案临时变"链接已复制 ✓" |
-| 主题 | `initTheme()`：localStorage > `prefers-color-scheme`；`theme-toggle` 切换 `html[data-theme]` + meta theme-color；图标由 CSS 切换显隐 |
+| 主题 | `initTheme()`：localStorage > `prefers-color-scheme`；`theme-toggle` 切换 `html[data-theme]` + meta theme-color；图标由 CSS 切换显隐。**head 内联脚本提前设 `data-theme` 防暗色首屏闪白**（与 initTheme 同一套存储，属"无内联样式键"规范的唯一脚本例外） |
+| 地图相框+放大 | `.map-figure` 相框（宣纸底/双线框/「长安校区」印章角标，浅深两套）；点击图片开 `#map-lightbox` 全屏遮罩（JS 动态创建，Esc/点击遮罩/×关闭，`beforeprint` 也关闭）；`.map-hint` 为放大提示 |
+| Hero 双栏封面 | `.hero-copy`（左：badge/标题/chips/按钮）+ `.hero-visual`（右：`.hero-map-card` 地图缩略卡 + `.hero-seal` 金印章，`aria-hidden`）；仅 ≥1024px 生效 grid 双栏，移动端 `.hero-visual` 隐藏；`.hero-stats` 跨双栏通栏 |
+| 金色通关徽章 | `.chip-done` 金渐变（16px）；全部模块已读时 JS 给 `body` 加 `all-done` 类 → `::before` 金色呼吸光圈（纯 opacity 动画）；TOC 圆点同步加 `.done` 金色 |
+| 通关证书 | `#cert-card`（`hidden`，清单 100% 时 `updateQuest()` 显示并填 `#cert-meta` 日期）；「保存证书图片」`#cert-save` 用 canvas 绘制 900×560 PNG 下载；`certIn` 入场动画 |
+| 抽屉进度摘要 | `#nav` 首子元素 `.drawer-progress`（仅 ≤760px 显示），`dp-modules/dp-list` 双条由 `updateQuest()` 同步更新 |
+| 导语结构 | `.li-lead`（模块 05）与 `.lead-list li > b:first-child`（模块 08）块级导语；`.li-warn` 红边警示条目；`.li-group/.li-group-name`（模块 07 军训三组，取 `--sec-c` 模块色，暗色固定 `#7ed3a5`） |
 | 撒花 | `fireConfetti()`：动态创建 `#confetti-canvas`，90 粒子重力动画 |
 | 统计 | 不蒜子脚本自动填充三个 span；兜底脚本 8s 未返回则显示"—" |
 | 返回顶部 | `back-top`，滚动 >500px 显示 |
@@ -204,6 +210,7 @@ xisu-guide/
 
 | Bug | 根因 | 修复 |
 |---|---|---|
+| **移动端抽屉打不开**（点击汉堡 ReferenceError，后续初始化全部中断） | `navToggle` click 处理器引用了未定义变量 `navEl`（正确变量是顶部的 `nav`） | `navEl` → `nav`（2026-08 视觉升级三修复） |
 | **二次访问崩溃**（清单/闯关面板不显示、主题无法切换） | 初始化早期 `viewed.forEach(markViewed)` 调 `updateQuest → flattenItems`，此时 `CHECKLIST` 尚未赋值（undefined）→ TypeError 中断整个 IIFE | 已读初始化移到脚本末尾；`updateQuest` 首行 `if (!CHECKLIST) return` 防护 |
 | **浅色模式 TOC 悬浮提示文字不可见** | 提示文字 `color: var(--background)`，浅色 `:root` 未定义该变量 → 回退继承深色 → 深字深底 | 补 `--background: #fbf6f1`；提示改用显式高对比色（浅：深底白字/暗：浅底深字） |
 | **已读✓徽章"未读"时也显示** | `.chip-done { display:inline-flex }` 覆盖了 UA 的 `[hidden]` 规则 | 加 `.chip-done[hidden]{display:none}` |
@@ -240,12 +247,15 @@ Remove-Item _askpass.cmd; Remove-Item Env:GIT_ASKPASS,Env:GH_TOKEN
 - 深色模式下地图图片用滤镜柔化（兼容但非完美）。
 
 **待办/可选方向（用户点名再做）**
-- Hero 双栏封面化（桌面端，书法大字+地图缩略+印章）
-- 已读徽章升级为"通关"金色徽章；清单 100% 后"通关证书"卡片
-- 移动端抽屉顶部进度摘要
+- ~~Hero 双栏封面化~~（✅ 2026-08 完成）
+- ~~已读徽章升级为"通关"金色徽章；清单 100% 后"通关证书"卡片~~（✅ 2026-08 完成）
+- ~~移动端抽屉顶部进度摘要~~（✅ 2026-08 完成）
+- ~~地图卷轴/相框化~~（✅ 2026-08 完成，含 lightbox）
 - 各模块"分享本模块"（锚点链接）
-- 地图卷轴/相框化
-- CSS 重构合并（当前 1160 行含三层追加，功能无问题但注释了"追加层"）
+- CSS 重构合并（当前 ~1480 行含三层追加，功能无问题但注释了"追加层"）
+- TOC 增强：tooltip 键盘 focus 可见；761–1279px 断档无导航辅助
+- 打印细节：`afterprint` 恢复 acc 折叠状态；表格 `min-width` 打印态取消
+- 字体自托管子集（消除 Google Fonts 依赖与标题二次跳变）
 
 ## 14. 常用命令速查
 
