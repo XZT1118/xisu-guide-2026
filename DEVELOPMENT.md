@@ -147,6 +147,7 @@ xisu-guide/
 | `xisu2026-checklist-v1` | `{checked: [id,...], updatedAt: 时间戳}` | 清单勾选（loadChecked/save） |
 | `xisu2026-viewed` | `["know","campus",...]` | 已读模块（markViewed/saveViewed） |
 | `xisu2026-theme` | `"dark"` \| `"light"` | 主题偏好（applyTheme） |
+| `xisu2026-stats-v1` | `{pv, uv, today, t: 时间戳}` | 页脚统计缓存（index.html 内联脚本，7 天过期） |
 
 | 功能 | 关键实现 |
 |---|---|
@@ -172,7 +173,7 @@ xisu-guide/
 | 抽屉进度摘要 | `#nav` 首子元素 `.drawer-progress`（仅 ≤760px 显示），`dp-modules/dp-list` 双条由 `updateQuest()` 同步更新 |
 | 导语结构 | `.li-lead`（模块 05）与 `.lead-list li > b:first-child`（模块 08）块级导语；`.li-warn` 红边警示条目；`.li-group/.li-group-name`（模块 07 军训三组，取 `--sec-c` 模块色，暗色固定 `#7ed3a5`） |
 | 撒花 | `fireConfetti()`：动态创建 `#confetti-canvas`，90 粒子重力动画 |
-| 统计 | 不蒜子脚本自动填充三个 span；兜底脚本 8s 未返回则显示"—" |
+| 统计 | 不蒜子脚本自动填充三个 `b.fs-num`；**MutationObserver 捕获新值**：千分位格式化 → 从旧值 countUp 滚动 → 加 `.is-live` 发光态 → 写 localStorage 缓存 `xisu2026-stats-v1`（7 天有效）；二次访问先秒显缓存（`.is-cached` 弱化态）；6s 内无数据且无缓存 → "—"；加载中为呼吸省略号"···"（`fsBlink`） |
 | 返回顶部 | `back-top`，滚动 >500px 显示 |
 
 ## 8. 内容区块速查（改内容去哪里）
@@ -242,7 +243,7 @@ Remove-Item _askpass.cmd; Remove-Item Env:GIT_ASKPASS,Env:GH_TOKEN
 
 **已知限制**
 - Google Fonts 在部分国内网络可能加载慢/失败（`display=swap` + 字体栈回退保证可读；如需稳定可自托管字体，但 Ma Shan Zheng 全量约 1–2MB，需子集化）。
-- 不蒜子为免费服务，计数有误差、偶发不可达（有兜底显示"—"）；无访问明细。
+- 不蒜子为免费服务，计数有误差、偶发不可达（有 localStorage 缓存 + 6s 兜底显示"—"平滑体验）；无访问明细。
 - 沙箱内无法截图/渲染预览，UI 微调需用户浏览器确认。
 - 深色模式下地图图片用滤镜柔化（兼容但非完美）。
 

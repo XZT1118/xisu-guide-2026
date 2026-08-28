@@ -613,25 +613,55 @@ tbody tr:nth-child(even) { background: #fdf7f3; }
 .footer-note b { color: var(--gold); }
 .footer-copy { margin-top: 14px; font-size: 14.5px; color: var(--gold); }
 
-/* 页脚访问统计 */
+/* 页脚访问统计：胶囊化（加载呼吸态 / 缓存弱化态 / 实时发光态） */
 .footer-stats {
   max-width: 1080px;
   margin: 0 auto;
-  padding: 16px 20px 30px;
+  padding: 20px 20px 34px;
   display: flex;
   flex-wrap: wrap;
-  gap: 8px 28px;
+  gap: 10px 12px;
   justify-content: center;
   border-top: 1px solid rgba(255, 255, 255, .14);
   font-size: 13.5px;
   color: #f5dede;
 }
-.fs-item b {
+.fs-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(255, 255, 255, .08);
+  border: 1px solid rgba(255, 255, 255, .16);
+  border-radius: 999px;
+  padding: 8px 18px;
+  transition: transform .2s ease-out, border-color .2s;
+}
+.fs-pill:hover { transform: translateY(-2px); border-color: rgba(244, 184, 62, .55); }
+.fs-label { font-style: normal; opacity: .88; }
+.fs-pill b {
   color: var(--gold);
   font-variant-numeric: tabular-nums;
   font-weight: 800;
+  font-size: 15.5px;
+  letter-spacing: .3px;
+  min-width: 2.2em;
+  text-align: center;
 }
-.fs-item:last-child { opacity: .7; font-size: 12.5px; }
+.fs-unit { font-size: 12px; opacity: .75; }
+.fs-num { opacity: .8; transition: opacity .3s; }
+.fs-num.is-cached { opacity: .85; }
+.fs-num.is-live { opacity: 1; text-shadow: 0 0 14px rgba(244, 184, 62, .35); }
+@keyframes fsBlink { 0%, 100% { opacity: .25; } 50% { opacity: .7; } }
+.fs-num:not(.is-live):not(.is-cached) { animation: fsBlink 1.4s ease-in-out infinite; }
+.fs-credit { align-self: center; opacity: .7; font-size: 12.5px; }
+@media (max-width: 760px) {
+  .fs-pill { padding: 7px 13px; font-size: 12.5px; }
+  .fs-pill b { font-size: 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fs-num:not(.is-live):not(.is-cached) { animation: none; opacity: .55; }
+  .fs-pill, .fs-pill:hover { transform: none; }
+}
 
 /* ---------------- 打印样式 ---------------- */
 @media print {

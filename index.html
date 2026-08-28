@@ -1077,11 +1077,11 @@
     </div>
   </div>
 
-  <div class="footer-stats">
-    <span class="fs-item">👀 本站浏览量：<b id="busuanzi_value_site_pv">统计加载中…</b> 次</span>
-    <span class="fs-item">🧑‍🤝‍🧑 访客数：<b id="busuanzi_value_site_uv">统计加载中…</b> 人</span>
-    <span class="fs-item">📈 今日访问：<b id="busuanzi_value_page_pv">统计加载中…</b> 次</span>
-    <span class="fs-item">💚 计数由不蒜子免费提供</span>
+  <div class="footer-stats" id="footer-stats">
+    <span class="fs-pill">👀 <i class="fs-label">本站浏览量</i><b class="fs-num" id="busuanzi_value_site_pv">···</b><span class="fs-unit">次</span></span>
+    <span class="fs-pill">🧑‍🤝‍🧑 <i class="fs-label">访客数</i><b class="fs-num" id="busuanzi_value_site_uv">···</b><span class="fs-unit">人</span></span>
+    <span class="fs-pill">📈 <i class="fs-label">今日访问</i><b class="fs-num" id="busuanzi_value_page_pv">···</b><span class="fs-unit">次</span></span>
+    <span class="fs-credit">💚 计数由不蒜子免费提供</span>
   </div>
 </footer>
 
@@ -1092,18 +1092,80 @@
 <!-- 不蒜子访问统计（免费静态站计数服务） -->
 <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <script>
-  /* 统计兜底：若统计服务 8 秒内未返回数字，占位文案改为 "—" */
+  /* 页脚统计增强：localStorage 缓存（二次访问秒显）→ 新数据到达时格式化+滚动动画+写缓存 → 6s 兜底显示 "—" */
   (function () {
-    var ids = ['busuanzi_value_site_pv', 'busuanzi_value_site_uv', 'busuanzi_value_page_pv'];
-    var HOLDER = '统计加载中…';
-    function finalize() {
-      ids.forEach(function (id) {
-        var el = document.getElementById(id);
-        if (el && el.textContent.indexOf(HOLDER) !== -1) el.textContent = '—';
-      });
+    var IDS = ['busuanzi_value_site_pv', 'busuanzi_value_site_uv', 'busuanzi_value_page_pv'];
+    var KEYS = { busuanzi_value_site_pv: 'pv', busuanzi_value_site_uv: 'uv', busuanzi_value_page_pv: 'today' };
+    var CACHE_KEY = 'xisu2026-stats-v1';
+    var MAX_AGE = 7 * 24 * 3600 * 1000;
+    var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function readCache() {
+      try {
+        var c = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
+        return (c && Date.now() - c.t < MAX_AGE) ? c : null;
+      } catch (e) { return null; }
     }
-    setTimeout(finalize, 8000);
-    window.addEventListener('load', function () { setTimeout(finalize, 5000); });
+    function writeCache(patch) {
+      try {
+        var c = readCache() || {};
+        for (var k in patch) c[k] = patch[k];
+        c.t = Date.now();
+        localStorage.setItem(CACHE_KEY, JSON.stringify(c));
+      } catch (e) {}
+    }
+    function fmt(n) { try { return Number(n).toLocaleString('zh-CN'); } catch (e) { return String(n); } }
+    function countUp(node, from, to) {
+      if (reduceMotion || to <= 0 || to > 1e7 || from >= to) { node.textContent = fmt(to); return; }
+      var t0 = null, DUR = 900;
+      function step(ts) {
+        if (t0 === null) t0 = ts;
+        var p = Math.min((ts - t0) / DUR, 1);
+        node.textContent = fmt(Math.round(from + (to - from) * (1 - Math.pow(1 - p, 3))));
+        if (p < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }
+    /* 二次访问：先显示上次数据（弱化态），新数据到达后自动覆盖 */
+    var cache = readCache();
+    IDS.forEach(function (id) {
+      var node = document.getElementById(id);
+      if (node && cache && cache[KEYS[id]] != null) {
+        node.textContent = fmt(cache[KEYS[id]]);
+        node.classList.add('is-cached');
+        node.title = '上次访问的数据，统计返回后自动更新';
+      }
+    });
+    function onFresh(node, value) {
+      var n = Number(String(value).replace(/[^0-9]/g, ''));
+      if (isNaN(n)) return;
+      var from = Number(String(node.textContent).replace(/[^0-9]/g, '')) || 0;
+      node.classList.remove('is-cached');
+      node.classList.add('is-live');
+      countUp(node, from, n);
+      var patch = {}; patch[KEYS[node.id]] = n; writeCache(patch);
+    }
+    if (typeof MutationObserver !== 'undefined') {
+      var mo = new MutationObserver(function (muts) {
+        muts.forEach(function (m) {
+          var node = m.target;
+          if (node && !node.classList.contains('is-live') && /[0-9]/.test(node.textContent)) onFresh(node, node.textContent);
+        });
+      });
+      var watch = function () {
+        IDS.forEach(function (id) {
+          var node = document.getElementById(id);
+          if (node) mo.observe(node, { characterData: true, childList: true });
+        });
+      };
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', watch); else watch();
+    }
+    /* 兜底：6s 内既无新数据也无缓存 → 显示 "—" */
+    setTimeout(function () {
+      IDS.forEach(function (id) {
+        var node = document.getElementById(id);
+        if (node && !node.classList.contains('is-live') && !node.classList.contains('is-cached')) node.textContent = '—';
+      });
+    }, 6000);
   })();
 </script>
 </body>
