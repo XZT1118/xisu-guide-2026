@@ -35,7 +35,7 @@ xisu-guide/
 ├── sitemap.xml            # 站点地图（SEO）
 ├── robots.txt             # 爬虫规则（SEO）
 └── assets/
-    ├── css/style.css      # 样式（西外红主题 + 打印样式，改 :root 配色变量即可换肤）
+    ├── css/style.css      # 样式（学院墨青主题：墨青主色+古金+朱印红点缀，改 :root 配色变量即可换肤）
     ├── js/app.js          # 交互脚本 + 必备清单数据（CHECKLIST 数组）
     └── img/               # campus-map.webp 地图、og-share.png 分享图、图标 PNG 等
 ```

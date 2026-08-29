@@ -197,7 +197,7 @@
     document.documentElement.setAttribute('data-theme', t);
     themeToggle.setAttribute('aria-pressed', t === 'dark' ? 'true' : 'false');
     var mc = document.querySelector('meta[name="theme-color"]');
-    if (mc) mc.setAttribute('content', t === 'dark' ? '#221c29' : '#c8102e');
+    if (mc) mc.setAttribute('content', t === 'dark' ? '#15171a' : '#1f4f5c');
   }
   (function initTheme() {
     var saved = null;
@@ -225,7 +225,7 @@
     var W = canvas.width = window.innerWidth;
     var H = canvas.height = window.innerHeight;
     var ctx = canvas.getContext('2d');
-    var colors = ['#c8102e', '#f4b83e', '#2f9e63', '#2a6cb8', '#ff8195', '#ffe08a'];
+    var colors = ['#1f4f5c', '#c9a24a', '#2f9e63', '#2a6cb8', '#7fc0d0', '#e8c97a'];
     var parts = [];
     for (var i = 0; i < 90; i++) {
       parts.push({
@@ -533,7 +533,7 @@
     return '<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8">' +
       '<meta name="viewport" content="width=device-width,initial-scale=1"><title>开学必备清单</title>' +
       '<style>body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;max-width:640px;margin:0 auto;padding:24px;color:#333}' +
-      'h1{color:#c8102e}h2{color:#9e0c24;font-size:18px;margin-top:22px}ul{list-style:none;padding:0}' +
+      'h1{color:#1f4f5c}h2{color:#16414d;font-size:18px;margin-top:22px}ul{list-style:none;padding:0}' +
       'li{padding:6px 0;border-bottom:1px dashed #eee}.ok{color:#2f9e63;font-weight:700}small{color:#999}' +
       '@media print{li{break-inside:avoid}}</style></head><body>' +
       '<h1>🎒 开学必备清单</h1><p>西安外国语大学 · 2026 新生通关宝典 ｜ ' + new Date().toLocaleString('zh-CN') + '</p>' +
@@ -554,8 +554,8 @@
     ctx.fillStyle = '#fff';
     ctx.fillRect(0, 0, width, height);
     var grad = ctx.createLinearGradient(0, 0, 0, headH);
-    grad.addColorStop(0, '#9e0c24');
-    grad.addColorStop(1, '#c8102e');
+    grad.addColorStop(0, '#16414d');
+    grad.addColorStop(1, '#1f4f5c');
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, width, headH);
     ctx.textBaseline = 'middle';
@@ -563,13 +563,13 @@
     ctx.font = 'bold 30px "Microsoft YaHei","PingFang SC",sans-serif';
     ctx.fillText('🎒 开学必备清单', pad, 42);
     ctx.font = '15px "Microsoft YaHei","PingFang SC",sans-serif';
-    ctx.fillStyle = '#f4d9a8';
+    ctx.fillStyle = '#e8c97a';
     ctx.fillText('西安外国语大学 · 2026 新生通关宝典', pad, 74);
     var y = headH + 18;
     CHECKLIST.forEach(function (g) {
-      ctx.fillStyle = '#fdeef0';
+      ctx.fillStyle = '#e2eaee';
       ctx.fillRect(pad, y - 20, width - pad * 2, catH);
-      ctx.fillStyle = '#c8102e';
+      ctx.fillStyle = '#16414d';
       ctx.font = 'bold 18px "Microsoft YaHei","PingFang SC",sans-serif';
       ctx.fillText(g.emoji + ' ' + g.name, pad + 12, y + 2);
       y += catH;
@@ -751,24 +751,24 @@
       rg.addColorStop(1, 'rgba(244,184,62,0)');
       ctx.fillStyle = rg;
       ctx.fillRect(0, 0, W, H);
-      ctx.strokeStyle = '#f4b83e';
+      ctx.strokeStyle = '#c9a24a';
       ctx.lineWidth = 6;
       ctx.strokeRect(18, 18, W - 36, H - 36);
-      ctx.strokeStyle = '#e09c14';
+      ctx.strokeStyle = '#a8843a';
       ctx.lineWidth = 2;
       ctx.strokeRect(32, 32, W - 64, H - 64);
       ctx.textAlign = 'center';
-      ctx.fillStyle = '#c98a0b';
+      ctx.fillStyle = '#a8843a';
       ctx.font = '700 20px "Microsoft YaHei", sans-serif';
       ctx.fillText('X I S U · 2 0 2 6', W / 2, 84);
-      ctx.fillStyle = '#6f0a1a';
+      ctx.fillStyle = '#0f2f38';
       ctx.font = '400 84px "Ma Shan Zheng", "KaiTi", "Microsoft YaHei", serif';
       ctx.fillText('通 关 证 书', W / 2, 196);
-      ctx.fillStyle = '#33303c';
+      ctx.fillStyle = '#26262c';
       ctx.font = '400 24px "Microsoft YaHei", sans-serif';
       ctx.fillText('恭喜！你已读完全部模块、备齐开学行囊', W / 2, 272);
       ctx.fillText('正式获得「2026 级通关 XISUer」称号', W / 2, 312);
-      ctx.fillStyle = '#6b6675';
+      ctx.fillStyle = '#5c5762';
       ctx.font = '400 20px "Microsoft YaHei", sans-serif';
       var metaText = certMeta ? certMeta.textContent : '';
       if (metaText) ctx.fillText(metaText, W / 2, 368);
@@ -780,7 +780,7 @@
       ctx.font = '400 30px "Ma Shan Zheng", "KaiTi", serif';
       ctx.fillText('通关', W - 106, H - 110);
       ctx.fillText('认证', W - 106, H - 76);
-      ctx.fillStyle = '#9e0c24';
+      ctx.fillStyle = '#16414d';
       ctx.font = '700 18px "Microsoft YaHei", sans-serif';
       ctx.fillText('西安外国语大学 · 新生通关宝典', W / 2, H - 52);
       if (canvas.toBlob) {

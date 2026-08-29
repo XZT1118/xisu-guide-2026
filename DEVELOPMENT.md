@@ -49,7 +49,7 @@ xisu-guide/
 │       ├── apple-touch-icon.png  # iOS 图标 180×180
 │       └── icon-192.png / icon-512.png  # PWA 图标
 ├── manifest.webmanifest      # PWA 清单（名称/图标/主题色）
-├── 404.html                  # 自定义 404（西外红风格）
+├── 404.html                  # 自定义 404（学院墨青风格）
 ├── sitemap.xml / robots.txt  # SEO
 ├── README.md                 # 简短说明（面向普通用户）
 └── DEVELOPMENT.md            # 本文档（面向开发者/Agent）
@@ -68,23 +68,27 @@ xisu-guide/
 
 ## 5. 设计系统
 
-### 5.1 配色（CSS 变量，浅/深两套）
+### 5.1 配色（CSS 变量，浅/深两套；2026-08 起「学院墨青」主题）
+> **设计逻辑**：墨青为主色（顶栏/Hero/页脚/标题/强调），西外红降为 `--stamp` 专用（印章/警示/强调标签）。变量名 `--red*` 保留但值已是墨青（历史命名，改动成本高，勿按字面理解）。
+
 | 变量 | 浅色 | 暗色（`html[data-theme="dark"]`） |
 |---|---|---|
-| `--red` | `#c8102e`（西外红） | 不变 |
-| `--red-dark` | `#6f0a1a` | 不变 |
-| `--red-deep` | `#9e0c24` | 不变 |
-| `--gold` / `--gold-deep` | `#f4b83e` / `#e09c14` | 不变 |
-| `--ink` | `#33303c` | `#e9e4ec` |
-| `--ink-soft` | `#6b6675` | `#a39cac` |
-| `--paper` / `--background` | `#fbf6f1` | `#17131a` |
-| `--card` | `#ffffff` | `#221c29` |
-| `--line` | `#f1e4e0` | `#322a38` |
-| `--red-soft` / `--gold-soft` / `--green-soft` | `#fdeef0` / `#fff4d9` / `#e8f6ee` | `#3a1a20` / `#3a2e15` / `#16291f` |
-| `--shadow` | `0 6px 16px rgba(158,12,36,.06)` | `0 6px 18px rgba(0,0,0,.45)` |
+| `--red`（墨青主色） | `#1f4f5c` | 不变 |
+| `--red-dark` / `--red-deep` | `#0f2f38` / `#16414d` | 不变 |
+| `--stamp`（朱印红） | `#c8102e` | `#ff6b7d`（暗色提亮保对比） |
+| `--stamp-deep` / `--stamp-soft` | `#9e0c24` / `#fdeef0` | `#c8102e` / `#3a1a20` |
+| `--gold` / `--gold-deep`（古金） | `#c9a24a` / `#a8843a` | 不变 |
+| `--ink` / `--ink-soft` | `#26262c` / `#5c5762` | `#e6e2dc` / `#9aa0a8` |
+| `--paper` / `--background` | `#f6f3ee` | `#15171a` |
+| `--card` | `#ffffff` | `#1e2126` |
+| `--line` / `--track` | `#e6e2dc` / `#e4e0da` | `#2a2e34` / `#2c3138` |
+| `--red-soft` / `--gold-soft` / `--green-soft` | `#e2eaee` / `#f6efdb` / `#e8f6ee` | `#16242a` / `#2a2416` / `#16291f` |
+| `--shadow` | `0 6px 16px rgba(20,30,40,.06)` | `0 6px 18px rgba(0,0,0,.45)` |
 
-- **模块主题色**：每个 `<section>` 定义 `--sec-c`（know/checkin/scam=红，campus/transfer=蓝 `#2a6cb8`，dorm/military=绿 `#1f7a4d`，food/checklist/services=金 `#c98a0b`），卡片顶部 4px 色条用 `box-shadow: ..., inset 0 4px 0 var(--sec-c)` 实现（跟随圆角，适配暗色）。
-- **深红大面积只出现在 Hero 与页脚**，内容区用米白纸底。
+- **`--stamp`（朱印红）使用范围（严格限定）**：`.section-kicker`/`.hero-seal`/`.cert-seal`/`.map-figure::after` 印章文字、`.warn-card`/`.warn-title`/`.li-warn`/`.tag-red` 警示强调。其余原红色场景一律走 `--red*`（现为墨青）。暗色下标题/链接强调色为浅墨青 `#7fc0d0`（写死在暗色覆盖块）。
+- **模块主题色**：每个 `<section>` 定义 `--sec-c`（know/checkin/scam=墨青（走默认 `--red`），campus/transfer=蓝 `#2a6cb8`，dorm/military=绿 `#1f7a4d`，food/checklist/services=金 `#c98a0b`），卡片顶部 4px 色条用 `box-shadow: ..., inset 0 4px 0 var(--sec-c)` 实现（跟随圆角，适配暗色）。
+- **深色大面积只出现在 Hero、顶栏与页脚**（墨青渐变），内容区用米白纸底。
+- **同步点**：改主色时须同步——index.html 的 `meta theme-color` 与 favicon SVG、app.js 的 `applyTheme` theme-color 值、confetti `colors` 数组、清单 PNG/证书 canvas 导出颜色、打印样式的 `#1f4f5c` 强调色。
 
 ### 5.2 图标体系
 - 全部为**内联线性 SVG**（`class="ic"`，24 viewBox，`stroke: currentColor; stroke-width: 2; round caps`），无外部 sprite。
