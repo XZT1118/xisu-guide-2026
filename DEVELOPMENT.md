@@ -179,7 +179,7 @@ xisu-guide/
 | 分享 | `share-btn`：`navigator.share` → 回退 `navigator.clipboard` → 回退 `window.prompt` |
 | 主题 | `initTheme()`：localStorage > `prefers-color-scheme`；`theme-toggle` 切换 `html[data-theme]` + meta theme-color |
 | 撒花 | `fireConfetti()`：动态建 `#confetti-canvas`，90 粒子重力 |
-| **页脚统计** | 胶囊卡片（fs-pill）；不蒜子填 `busuanzi_value_site_pv/uv/page_pv`；localStorage 缓存上次数字**秒显**（`···` 呼吸加载态），拿到新值后**数字滚动 + 千分位**；若 6s 未返回显示"—"兜底 |
+| **页脚统计** | 胶囊卡片（fs-pill）；不蒜子填 `busuanzi_site_pv/site_uv/today_pv`（`today_pv`=今日总访问量，**每天 00:00 自动重置**，纠正历史误用累计的 `page_pv`）；localStorage 缓存上次数字**秒显**（`···` 呼吸加载态），拿到新值后**数字滚动 + 千分位**；若 6s 未返回显示"—"兜底 |
 | 返回顶部 | `back-top`，滚动 >500px 显示 |
 
 ## 8. 内容区块速查（改内容去哪里）
@@ -247,7 +247,7 @@ Remove-Item _askpass.cmd; Remove-Item Env:GIT_ASKPASS,Env:GH_TOKEN
 
 **已知限制**
 - Google Fonts（马善政体）在部分国内网络可能加载慢/失败（`display=swap` + 字体栈回退保证可读；如需稳定可自托管，但全量约 1–2MB 需子集化）。
-- 不蒜子为免费服务，计数有误差、偶发不可达（有缓存秒显 + 6s 兜底）；无访问明细。
+- 不蒜子为免费服务，计数有误差、偶发不可达（有缓存秒显 + 6s 兜底）；无访问明细。当前采用**官方 v3.6.9**（`cdn.busuanzi.cc`，已从旧 `busuanzi.ibruce.info/2.3` 升级），「今日访问」= `today_pv` 每天 00:00 自动重置；因新版本为 2025 年重发布服务、数据库重建过，**本站总量/访客数历史累计会从新库重新累计（数值回落属预期）**。
 - 沙箱内无法截图/渲染预览，UI 微调需用户浏览器确认。
 - 深色模式下地图图片用滤镜柔化（兼容但非完美）。
 

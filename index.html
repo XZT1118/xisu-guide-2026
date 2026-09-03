@@ -1078,9 +1078,9 @@
   </div>
 
   <div class="footer-stats" id="footer-stats">
-    <span class="fs-pill">👀 <i class="fs-label">本站浏览量</i><b class="fs-num" id="busuanzi_value_site_pv">···</b><span class="fs-unit">次</span></span>
-    <span class="fs-pill">🧑‍🤝‍🧑 <i class="fs-label">访客数</i><b class="fs-num" id="busuanzi_value_site_uv">···</b><span class="fs-unit">人</span></span>
-    <span class="fs-pill">📈 <i class="fs-label">今日访问</i><b class="fs-num" id="busuanzi_value_page_pv">···</b><span class="fs-unit">次</span></span>
+    <span class="fs-pill">👀 <i class="fs-label">本站浏览量</i><b class="fs-num" id="busuanzi_site_pv">···</b><span class="fs-unit">次</span></span>
+    <span class="fs-pill">🧑‍🤝‍🧑 <i class="fs-label">访客数</i><b class="fs-num" id="busuanzi_site_uv">···</b><span class="fs-unit">人</span></span>
+    <span class="fs-pill">📈 <i class="fs-label">今日访问</i><b class="fs-num" id="busuanzi_today_pv">···</b><span class="fs-unit">次</span></span>
     <span class="fs-credit">💚 计数由不蒜子免费提供</span>
   </div>
 </footer>
@@ -1089,13 +1089,13 @@
 
 <script src="assets/js/app.js"></script>
 
-<!-- 不蒜子访问统计（免费静态站计数服务） -->
-<script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<!-- 不蒜子访问统计（官方当前版本 v3.6.9；今日计数每天 00:00 自动重置） -->
+<script async src="https://cdn.busuanzi.cc/busuanzi/3.6.9/busuanzi.min.js"></script>
 <script>
   /* 页脚统计增强：localStorage 缓存（二次访问秒显）→ 新数据到达时格式化+滚动动画+写缓存 → 6s 兜底显示 "—" */
   (function () {
-    var IDS = ['busuanzi_value_site_pv', 'busuanzi_value_site_uv', 'busuanzi_value_page_pv'];
-    var KEYS = { busuanzi_value_site_pv: 'pv', busuanzi_value_site_uv: 'uv', busuanzi_value_page_pv: 'today' };
+    var IDS = ['busuanzi_site_pv', 'busuanzi_site_uv', 'busuanzi_today_pv'];
+    var KEYS = { busuanzi_site_pv: 'pv', busuanzi_site_uv: 'uv', busuanzi_today_pv: 'today' };
     var CACHE_KEY = 'xisu2026-stats-v1';
     var MAX_AGE = 7 * 24 * 3600 * 1000;
     var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
