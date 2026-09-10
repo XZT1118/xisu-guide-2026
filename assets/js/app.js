@@ -265,17 +265,37 @@
   }
 
   /* ================= 开学季防骗提醒弹窗 =================
-     每次打开页面弹出（报到高峰期不记忆已读），4 种关闭方式：
-     × / 「我知道了」/ 点遮罩 / Esc；主按钮是 <a href="#scam">，走全站平滑滚动。 */
+     显示策略：每次打开页面弹出，但**关闭后当天不再弹**（本地日期判断，跨天自动恢复）。
+     4 种关闭方式：× / 「我知道了」/ 点遮罩 / Esc；主按钮是 <a href="#scam">，走全站平滑滚动。 */
   var scamPop = document.getElementById('scam-pop');
   if (scamPop) {
     var scamPopClose = document.getElementById('scam-pop-close');
     var scamPopLater = document.getElementById('scam-pop-later');
     var scamPopCta = document.getElementById('scam-pop-cta');
+    var SCAMPOP_KEY = 'xisu2026-scampop-v1';
     var scamPopClosing = false;
     /* 初始化时记录 body 原始 overflow（弹窗关闭后原样恢复，不写死空值） */
     var scamPopPrevOverflow = document.body.style.overflow;
     var focusBeforePop = null;
+
+    /* 本地日期（YYYY-MM-DD）：用本地时区而非 UTC，才符合用户对"今天"的直觉 */
+    function dayStamp(d) {
+      var dt = d || new Date();
+      var m = dt.getMonth() + 1;
+      var day = dt.getDate();
+      return dt.getFullYear() + '-' + (m < 10 ? '0' : '') + m + '-' + (day < 10 ? '0' : '') + day;
+    }
+    function readPopState() {
+      try { return JSON.parse(localStorage.getItem(SCAMPOP_KEY) || 'null'); } catch (e) { return null; }
+    }
+    /* 今天已关闭过 → 本次不再弹 */
+    function closedToday() {
+      var st = readPopState();
+      return !!(st && st.day === dayStamp());
+    }
+    function rememberClosed() {
+      try { localStorage.setItem(SCAMPOP_KEY, JSON.stringify({ day: dayStamp(), at: Date.now() })); } catch (e) {}
+    }
 
     function openScamPop() {
       if (!scamPop.hidden) { return; } /* 已打开，避免重复触发入口动画 */
@@ -303,6 +323,8 @@
         scamPop.classList.remove('is-closing');
         scamPop.hidden = true;
         scamPop.style.display = 'none';
+        /* 记录"今天已关闭"：当天刷新/再次进入都不再弹 */
+        rememberClosed();
         document.body.style.overflow = scamPopPrevOverflow;
         scamPopClosing = false;
         /* 焦点回到弹窗打开前的位置，避免停留在已隐藏元素上 */
@@ -326,11 +348,14 @@
     });
     document.addEventListener('keydown', onScamPopKey);
 
-    /* 延迟到首帧之后再弹，避开 Hero 逐字动画/数字滚动，也避免打断首屏阅读 */
-    if (window.requestAnimationFrame) {
-      window.requestAnimationFrame(function () { setTimeout(openScamPop, 350); });
-    } else {
-      setTimeout(openScamPop, 350);
+    /* 延迟到首帧之后再弹，避开 Hero 逐字动画/数字滚动，也避免打断首屏阅读；
+       若今天已经关闭过弹窗（localStorage 记录当天日期），本次直接不弹 */
+    if (!closedToday()) {
+      if (window.requestAnimationFrame) {
+        window.requestAnimationFrame(function () { setTimeout(openScamPop, 350); });
+      } else {
+        setTimeout(openScamPop, 350);
+      }
     }
   }
 

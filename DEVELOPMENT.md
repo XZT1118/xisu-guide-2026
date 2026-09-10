@@ -160,12 +160,13 @@ xisu-guide/
 
 ## 7. 功能实现细节（DOM id / 函数名 / localStorage key）
 
-**localStorage key（3 个；新增功能请勿私自加 key）**：
+**localStorage key（4 个；新增功能请勿私自加 key）**：
 | Key | 格式 | 用途 |
 |---|---|---|
 | `xisu2026-checklist-v1` | `{checked: [id,...], updatedAt}` | 清单勾选 |
 | `xisu2026-viewed` | `["know","campus",...]` | 已读模块 |
 | `xisu2026-theme` | `"dark"` \| `"light"` | 主题偏好 |
+| `xisu2026-scampop-v1` | `{day:"YYYY-MM-DD", at:时间戳}` | 防骗弹窗"当天已关闭"抑制（本地日期，跨天自动失效） |
 
 | 功能 | 关键实现 |
 |---|---|
@@ -188,7 +189,7 @@ xisu-guide/
 | 主题 | `initTheme()`：localStorage > `prefers-color-scheme`；`theme-toggle` 切换 `html[data-theme]` + meta theme-color |
 | 撒花 | `fireConfetti()`：动态建 `#confetti-canvas`，90 粒子重力 |
 | **页脚统计** | 胶囊卡片（fs-pill）；不蒜子填 `busuanzi_site_pv/site_uv/today_pv`（`today_pv`=今日总访问量，**每天 00:00 自动重置**，纠正历史误用累计的 `page_pv`）；localStorage 缓存上次数字**秒显**（`···` 呼吸加载态），拿到新值后**数字滚动 + 千分位**；若 6s 未返回显示"—"兜底 |
-| **开学季防骗弹窗** | `#scam-pop`（位于 body 第 2 子元素，HTML 里静态写好并 `hidden` + 内联 `display:none`，防 CSS 未加载时闪屏）；`openScamPop()` 在 `rAF + setTimeout(350ms)` 后打开（避开 Hero 逐字/数字滚动），加 `.is-open` 触发入场动画并锁 `body` 滚动；`closeScamPop()` 加 `.is-closing`，200ms 后隐藏并恢复滚动。**关闭方式：× / 「我知道了」/ 点遮罩（`e.target === scamPop`）/ Esc**。主按钮是 `<a href="#scam">`，点击只 `closeScamPop()`、**不 `preventDefault`**，靠全站 `scroll-behavior: smooth` 跳转。**按用户要求每次加载都弹，不写 localStorage**（避免开学季的学生只看一次就忘）。 |
+| **开学季防骗弹窗** | `#scam-pop`（位于 body 第 2 子元素，HTML 里静态写好并 `hidden` + 内联 `display:none`，防 CSS 未加载时闪屏）；`openScamPop()` 在 `rAF + setTimeout(350ms)` 后打开（避开 Hero 逐字/数字滚动），加 `.is-open` 触发入场动画并锁 `body` 滚动；`closeScamPop()` 加 `.is-closing`，200ms 后隐藏、恢复滚动并 `rememberClosed()` 写当天日期。**关闭方式：× / 「我知道了」/ 点遮罩（`e.target === scamPop`）/ Esc**。主按钮是 `<a href="#scam">`，点击只 `closeScamPop()`、**不 `preventDefault`**，靠全站 `scroll-behavior: smooth` 跳转。**显示频率：每次打开都弹，但关闭后当天不再弹**——`closedToday()` 比较 `localStorage['xisu2026-scampop-v1'].day` 与本地日期（用本地时区，非 UTC），不匹配或数据损坏/为空都照常弹；跨天自动恢复。 |
 | 返回顶部 | `back-top`，滚动 >500px 显示 |
 
 ## 8. 内容区块速查（改内容去哪里）
@@ -221,7 +222,7 @@ xisu-guide/
 1. **本地预览**：双击 `index.html` 即开（无构建）。`file://` 下 localStorage 按文件路径隔离。
 2. **静态校验（每轮必做）**：`node --check assets/js/app.js`；HTML 标签配平（`div/section/a/li/...`，**path/circle/img/meta/link/input 是无闭合元素，不算错**）；CSS 花括号配平；新 DOM id 与 JS `getElementById` 一一对应。
 3. **运行时复现（重要）**：本机沙箱**无浏览器渲染能力**（Edge headless 截图失败）。写 Node + DOM 桩驱动 app.js 可查运行时错误——**项目曾凭它找到"二次访问崩溃"bug**（见 §11）。排查"第二次访问/特定 localStorage 状态"问题必须用此法（桩要点：localStorage 预置数据；document/window/IntersectionObserver/localStorage/navigator.clipboard/URL.createObjectURL/Blob/canvas.getContext 都需提供；**别忘 `el.childNodes` 与 innerHTML 支持**，否则 hero 逐字/清单渲染会先抛错，把后面的初始化全带崩，看起来像"弹窗没生效"）。
-   - 本次防骗弹窗用同一方法验证了 27 项断言（初始隐藏 / 350ms 延迟弹出 / 锁滚动 / `.is-open` / × · 「我知道了」· 遮罩 · Esc 四种关闭 / 重复关闭不抛错 / 关后恢复滚动 / 主按钮不拦截默认跳转 / 清单既有功能回归）。
+   - 本次防骗弹窗用同一方法验证了 22 项断言（首次访问弹出 / 关闭写当天日期 / 当天刷新不再弹 / 跨天自动恢复 / 存储损坏与脏数据容错 / × · 「我知道了」· 遮罩 · Esc 四种关闭 / 重复关闭不抛错 / 关后恢复滚动 / 主按钮不拦截默认跳转 / 清单既有功能回归）。**验证"日期相关"逻辑时，桩里要替换 `Date`**（`new Function(..., 'Date', FakeDate)`）才能模拟跨天，别真等一天。
 4. **发布后验证**：`curl.exe` 抓线上 HTML 查关键标志；`gh api repos/XZT1118/xisu-guide-2026/contents/...` 核对仓库（api.github.com 通道比 github.io 稳定）。
 
 ## 11. 历史 Bug 与修复（引以为戒）
@@ -263,11 +264,12 @@ Remove-Item _askpass.cmd; Remove-Item Env:GIT_ASKPASS,Env:GH_TOKEN
 - 不蒜子为免费服务，计数有误差、偶发不可达（有缓存秒显 + 6s 兜底）；无访问明细。当前采用**官方 v3.6.9**（`cdn.busuanzi.cc`，已从旧 `busuanzi.ibruce.info/2.3` 升级），「今日访问」= `today_pv` 每天 00:00 自动重置；因新版本为 2025 年重发布服务、数据库重建过，**本站总量/访客数历史累计会从新库重新累计（数值回落属预期）**。
 - 沙箱内无法截图/渲染预览，UI 微调需用户浏览器确认。
 - 深色模式下地图图片用滤镜柔化（兼容但非完美）。
-- **防骗弹窗按用户要求"每次打开都弹"，不记忆已读**（无 localStorage 抑制）：老生/频繁访问的用户会觉得重复，如需改为"7 天一次"只需在 `openScamPop` 前加一个 localStorage 时间戳判断（新增 key 需同步本文档 §7）。
+- **防骗弹窗按用户要求做的是"每次打开都弹、关闭后当天不再弹"**，不是"每次必弹"也不是"永久只弹一次"：靠 `xisu2026-scampop-v1` 记录当天日期，跨天自动恢复。要改频率只需动 `closedToday()` / `rememberClosed()` 两处，勿改其余逻辑。
+- 若用户浏览器禁用了 localStorage（无痕/隐私模式），抑制会失效 → 每次都弹；`try/catch` 已兜底，不会报错。
 
 **已完成（勿重复做）**
 - Hero 双栏封面、地图相框 + 点击放大、通关金徽章 + 100% 证书、抽屉进度、页脚统计胶囊 + 缓存 + 数字滚动、墨青主题、暗色补齐。
-- **开学季防骗弹窗 + 防骗模块扩充（2026-09，用户批准的追加改动）**：①新增 `#scam-pop` 弹窗（每次加载弹、4 种关闭方式、主按钮跳 `#scam`、朱印红警示样式、暗色/响应式/打印/reduced-motion 全覆盖）；②`#scam` 模块新增两条骗局卡——「🖊️ 宿舍高价卖笔（"学长学姐实习冲业绩"）」「💬 假"表白墙"加好友（其实是广告号）」，并把「📶 电话卡/办卡推销」改写为「假"必须激活卡"（流量卡冒充校园卡）」、「🚪 宿舍上门推销」补充高价卖笔话术；③官方安全提示补第 6 条"办卡/激活"事实（校园一卡通由学院发放、卡务中心充值；"激活"只指网办大厅与企业微信，入口在学校官网）——**依据官方入学指南原文（素材文件第 101–103 行），未编造政策**。
+- **开学季防骗弹窗 + 防骗模块扩充（2026-09，用户批准的追加改动）**：①新增 `#scam-pop` 弹窗（关闭后当天不再弹、4 种关闭方式、主按钮跳 `#scam`、朱印红警示样式、暗色/响应式/打印/reduced-motion 全覆盖）；②`#scam` 模块新增两条骗局卡——「🖊️ 宿舍高价卖笔（"学长学姐实习冲业绩"）」「💬 假"表白墙"加好友（其实是广告号）」，并把「📶 电话卡/办卡推销」改写为「假"必须激活卡"（流量卡冒充校园卡）」、「🚪 宿舍上门推销」补充高价卖笔话术；③官方安全提示补第 6 条"办卡/激活"事实（校园一卡通由学院发放、卡务中心充值；"激活"只指网办大厅与企业微信，入口在学校官网）——**依据官方入学指南原文（素材文件第 101–103 行），未编造政策**。
 - **全站文案优化轮（2026-09，用户批准的例外改动）**：①硬伤修复——「三不一核实」（原写四不实际三不）、通关证书文案与触发条件对齐（只提"行囊备齐"不再声称"读完全部模块"）、Hero 统计卡补量词"所"、食堂"饭卡/一卡通"口径澄清；②长句拆分——线上选宿舍、医保待遇等待期、入学体检、组织关系转接、转专业申请时间、卓越班区分等 110+ 字长 li 全部拆短；③去重——报到时间线（li 与 tip 二处合一）、军训正文 URL（与来源折叠区重复，已删正文侧）、快递/行李邮寄两段重复（保留宿舍侧完整版）；④风格统一——日期区间统一用「—」、宿舍房型卡标题补 emoji、小标题顺句。**事实、数字、链接、来源标注零增删**（正文 URL 47→45 仅删重复项，折叠区仍保留）。
 
 **待办/可选方向（用户点名再做）**
@@ -275,7 +277,6 @@ Remove-Item _askpass.cmd; Remove-Item Env:GIT_ASKPASS,Env:GH_TOKEN
 - 字体自托管（需要子集化工具）
 - CSS 重构合并（当前 1678 行含多层追加，功能正常但维护成本高）
 - 访问统计明细（需换百度统计/友盟等注册制服务）
-- 弹窗频率记忆（"7 天一次"或"关闭后当天不再弹"，见上方限制说明）
 
 ## 14. 常用命令速查
 
