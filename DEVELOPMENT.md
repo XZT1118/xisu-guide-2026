@@ -1,7 +1,7 @@
 # 西安外国语大学 · 2026 新生通关宝典 — 开发说明文档（Agent 交接手册）
 
 > 本文档面向后续接手的任何 AI Agent / 开发者。**先读本文档再动手**，可以避免重复调研和破坏既有功能。
-> 最后更新：2026-09（全站文案优化轮：修复硬伤 + 拆分长句 + 正文去重，事实/链接/结构零改动；上一里程碑为墨青主题版 `936c12f` + 今日访问修复 `3e90761`）
+> 最后更新：2026-09（开学季防骗弹窗 + 防骗模块三类新骗局；上一里程碑为全站文案优化轮 `264ba62`，再上一为墨青主题版 `936c12f` + 今日访问修复 `3e90761`）
 
 ---
 
@@ -21,6 +21,7 @@
 ## 2. 硬性约束（任何改动都必须遵守）
 
 1. **不改动、不删减任何文字内容、链接和信息结构**：10 个模块及顺序保持不变（除非用户明确要求）。
+   - 例外：开学季新增骗局条目（高价卖笔 / 假"必须激活卡" / 假表白墙）属经用户批准的**追加**内容；原有条目只做措辞补充，事实、数字与链接未删改。
 2. **不破坏既有功能**（完整清单见 §7，改完必须逐项回归）：
    - 清单勾选 + localStorage 持久化
    - 6 种格式导出（txt/md/csv/png/json/html）
@@ -31,6 +32,7 @@
    - 暗色模式（系统偏好 + 手动切换 + localStorage）
    - 清单 100% 撒花、分享按钮、返回顶部、打印样式、details 折叠
    - 页脚统计（不蒜子 + localStorage 缓存秒显 + 数字滚动 + 6s 兜底）
+   - **开学季防骗弹窗**（每次加载弹出 / 4 种关闭方式 / 主按钮跳 `#scam`）
    - SEO/OG/JSON-LD、自定义 404、PWA manifest
 3. **文案气质**：学长学姐口吻 + 闯关游戏化。所有用户可见文案用中文。
 4. **响应式**：移动端（≤760px）/ 桌面端（含 ≥1280px TOC 变体、Hero 双栏）。
@@ -42,10 +44,10 @@
 
 ```
 xisu-guide/
-├── index.html                # 主页面（全部内容与结构，~1181 行）
+├── index.html                # 主页面（全部内容与结构，~1218 行；含 #scam-pop 防骗弹窗）
 ├── assets/
-│   ├── css/style.css         # 全站样式（~1520 行，基础层 + 多段"追加层"）
-│   ├── js/app.js             # 全部交互逻辑（~807 行，单 IIFE）
+│   ├── css/style.css         # 全站样式（~1678 行，基础层 + 多段"追加层"）
+│   ├── js/app.js             # 全部交互逻辑（~877 行，单 IIFE）
 │   └── img/
 │       ├── campus-map.jpg    # 地图原图（196KB，保留备用）
 │       ├── campus-map.webp   # 线上使用的地图（62KB）
@@ -63,7 +65,7 @@ xisu-guide/
 
 - **零依赖**：无 npm、无 CDN 库（唯一外部资源是 Google Fonts 马善政体 + 不蒜子统计脚本）。
 - **纯原生 JS**：`app.js` 是单 IIFE（`(function(){ 'use strict'; ... })()`），所有状态在闭包内。
-- **CSS 分层**：`style.css` 由基础主题 + 组件 + 打印 + 多段"追加层"（`2026 视觉升级（一）/（二）/…`）组成，追加层覆盖同名规则。修改样式优先在追加层覆盖，避免大改基础。
+- **CSS 分层**：`style.css` 由基础主题 + 组件 + 打印 + 多段"追加层"（`2026 视觉升级（一）/（二）/…（四）防骗弹窗`）组成，追加层覆盖同名规则。修改样式优先在追加层覆盖，避免大改基础。
 - **无内联样式键**：动态样式用 CSS 变量（`--i` 动画延迟、`--p` 进度环、`--sec-c` 模块色、`--track` 进度轨道）。
 - **字体栈**：展示字体（大标题）`--font-display: "Ma Shan Zheng", "Kaiti SC", "KaiTi", "Microsoft YaHei", ...`（Google Fonts，`display=swap`，不可用回退系统）；正文系统字体栈。**小标题类元素显式 `font-family: inherit` 回退**（书法体小字号不可读）。
 
@@ -98,7 +100,7 @@ xisu-guide/
 - 全部为**内联线性 SVG**（`class="ic"`，24 viewBox，`stroke: currentColor; stroke-width: 2; round caps`），无外部 sprite。
 - 分类：导航芯片（15px）、模块头图标（30px，彩色渐变圆底 `icon-red/gold/green/blue`）、按钮（1em）、目录点（14px）。
 - 无法替换的 emoji（内容性图标）加**圆底托**：`.emoji-orb` + `orb-red/gold/green/blue`；位置类 emoji（place-emoji/mini-emoji/contact-emoji/fact-emoji）用 CSS 圆底渐变。
-- ⚠️ 新增图标保持同一风格（2 号描边、圆角线帽），颜色用 `currentColor`。
+- ⚠️ 新增图标保持同一风格（2 号描边、圆角线帽），颜色用 `currentColor`（防骗弹窗的关闭 ×、盾牌 ✓ 均按此写）。
 
 ### 5.3 动效清单（含时长）
 | 动效 | 实现 | 时长 |
@@ -113,6 +115,10 @@ xisu-guide/
 | 进度条/进度环 | transition width / `--p` | 0.3–0.4s |
 | 页脚统计呼吸加载态 | `···` 闪烁 keyframes | 循环（获取后停止） |
 | 撒花庆祝 | 手写 canvas，90 粒子 | 1.6s |
+| 防骗弹窗入场 | `#scam-pop` 遮罩 `scamVeilIn` + `.scam-pop-card` `scamCardIn`（translateY+scale 轻微回弹） | .26s / .30s |
+| 防骗弹窗关闭 | `.is-closing` → `scamVeilOut` / `scamCardOut`，JS 200ms 后收尾 | .16s |
+| 主按钮呼吸光晕 | `.scam-pop-cta::after` `scamCtaPulse` | 2.6s 循环 |
+| 关闭按钮悬停旋转 | `.scam-pop-close:hover`（90° 旋转） | .15s |
 所有动效在 `prefers-reduced-motion: reduce` 下关闭（style.css 末尾集中规则）。
 
 ### 5.4 字体应用范围
@@ -126,7 +132,9 @@ xisu-guide/
       + manifest + favicon(SVG data URI) + Google Fonts(preconnect×2 + css2 Ma+Shan+Zheng)
       + style.css + JSON-LD(WebSite + FAQPage)
 <body>
-  <div id="read-bar">            阅读进度条（fixed 3px 古金）
+  <div class="read-bar">            阅读进度条（fixed 3px 古金）
+  <div id="scam-pop">               开学季防骗弹窗（body 第 2 个子元素，hidden+display:none；
+                                    .scam-pop-card / #scam-pop-close / #scam-pop-cta / #scam-pop-later）
   <header class="topbar">
     <button id="nav-toggle">     汉堡（仅移动端）
     <a class="brand">            XISU 徽标 + 站名
@@ -152,7 +160,7 @@ xisu-guide/
 
 ## 7. 功能实现细节（DOM id / 函数名 / localStorage key）
 
-**localStorage key（3 个）**：
+**localStorage key（3 个；新增功能请勿私自加 key）**：
 | Key | 格式 | 用途 |
 |---|---|---|
 | `xisu2026-checklist-v1` | `{checked: [id,...], updatedAt}` | 清单勾选 |
@@ -180,6 +188,7 @@ xisu-guide/
 | 主题 | `initTheme()`：localStorage > `prefers-color-scheme`；`theme-toggle` 切换 `html[data-theme]` + meta theme-color |
 | 撒花 | `fireConfetti()`：动态建 `#confetti-canvas`，90 粒子重力 |
 | **页脚统计** | 胶囊卡片（fs-pill）；不蒜子填 `busuanzi_site_pv/site_uv/today_pv`（`today_pv`=今日总访问量，**每天 00:00 自动重置**，纠正历史误用累计的 `page_pv`）；localStorage 缓存上次数字**秒显**（`···` 呼吸加载态），拿到新值后**数字滚动 + 千分位**；若 6s 未返回显示"—"兜底 |
+| **开学季防骗弹窗** | `#scam-pop`（位于 body 第 2 子元素，HTML 里静态写好并 `hidden` + 内联 `display:none`，防 CSS 未加载时闪屏）；`openScamPop()` 在 `rAF + setTimeout(350ms)` 后打开（避开 Hero 逐字/数字滚动），加 `.is-open` 触发入场动画并锁 `body` 滚动；`closeScamPop()` 加 `.is-closing`，200ms 后隐藏并恢复滚动。**关闭方式：× / 「我知道了」/ 点遮罩（`e.target === scamPop`）/ Esc**。主按钮是 `<a href="#scam">`，点击只 `closeScamPop()`、**不 `preventDefault`**，靠全站 `scroll-behavior: smooth` 跳转。**按用户要求每次加载都弹，不写 localStorage**（避免开学季的学生只看一次就忘）。 |
 | 返回顶部 | `back-top`，滚动 >500px 显示 |
 
 ## 8. 内容区块速查（改内容去哪里）
@@ -187,6 +196,8 @@ xisu-guide/
 | 内容 | 位置 |
 |---|---|
 | 10 模块正文 | index.html 对应 `<section id="...">`，每段有中文注释 |
+| 防骗弹窗文案 | index.html 顶部 `#scam-pop`（标题/三条骗局/主按钮文案/底部提示） |
+| 防骗新骗局条目 | index.html `#scam` 的 `.grid.grid-3` 内 `.scam-card`（每张卡固定"套路/识别/应对"三段） |
 | 清单条目 | app.js 顶部 `CHECKLIST`（id 必须全局唯一） |
 | 重要网址 | index.html 末尾 `link-grid` |
 | FAQ（SEO） | index.html head JSON-LD（7 问） |
@@ -209,7 +220,8 @@ xisu-guide/
 
 1. **本地预览**：双击 `index.html` 即开（无构建）。`file://` 下 localStorage 按文件路径隔离。
 2. **静态校验（每轮必做）**：`node --check assets/js/app.js`；HTML 标签配平（`div/section/a/li/...`，**path/circle/img/meta/link/input 是无闭合元素，不算错**）；CSS 花括号配平；新 DOM id 与 JS `getElementById` 一一对应。
-3. **运行时复现（重要）**：本机沙箱**无浏览器渲染能力**（Edge headless 截图失败）。写 Node + DOM 桩驱动 app.js 可查运行时错误——**项目曾凭它找到"二次访问崩溃"bug**（见 §11）。排查"第二次访问/特定 localStorage 状态"问题必须用此法（桩要点：localStorage 预置数据；document/window/IntersectionObserver/localStorage/navigator.clipboard/URL.createObjectURL/Blob/canvas.getContext 都需提供）。
+3. **运行时复现（重要）**：本机沙箱**无浏览器渲染能力**（Edge headless 截图失败）。写 Node + DOM 桩驱动 app.js 可查运行时错误——**项目曾凭它找到"二次访问崩溃"bug**（见 §11）。排查"第二次访问/特定 localStorage 状态"问题必须用此法（桩要点：localStorage 预置数据；document/window/IntersectionObserver/localStorage/navigator.clipboard/URL.createObjectURL/Blob/canvas.getContext 都需提供；**别忘 `el.childNodes` 与 innerHTML 支持**，否则 hero 逐字/清单渲染会先抛错，把后面的初始化全带崩，看起来像"弹窗没生效"）。
+   - 本次防骗弹窗用同一方法验证了 27 项断言（初始隐藏 / 350ms 延迟弹出 / 锁滚动 / `.is-open` / × · 「我知道了」· 遮罩 · Esc 四种关闭 / 重复关闭不抛错 / 关后恢复滚动 / 主按钮不拦截默认跳转 / 清单既有功能回归）。
 4. **发布后验证**：`curl.exe` 抓线上 HTML 查关键标志；`gh api repos/XZT1118/xisu-guide-2026/contents/...` 核对仓库（api.github.com 通道比 github.io 稳定）。
 
 ## 11. 历史 Bug 与修复（引以为戒）
@@ -251,16 +263,19 @@ Remove-Item _askpass.cmd; Remove-Item Env:GIT_ASKPASS,Env:GH_TOKEN
 - 不蒜子为免费服务，计数有误差、偶发不可达（有缓存秒显 + 6s 兜底）；无访问明细。当前采用**官方 v3.6.9**（`cdn.busuanzi.cc`，已从旧 `busuanzi.ibruce.info/2.3` 升级），「今日访问」= `today_pv` 每天 00:00 自动重置；因新版本为 2025 年重发布服务、数据库重建过，**本站总量/访客数历史累计会从新库重新累计（数值回落属预期）**。
 - 沙箱内无法截图/渲染预览，UI 微调需用户浏览器确认。
 - 深色模式下地图图片用滤镜柔化（兼容但非完美）。
+- **防骗弹窗按用户要求"每次打开都弹"，不记忆已读**（无 localStorage 抑制）：老生/频繁访问的用户会觉得重复，如需改为"7 天一次"只需在 `openScamPop` 前加一个 localStorage 时间戳判断（新增 key 需同步本文档 §7）。
 
 **已完成（勿重复做）**
 - Hero 双栏封面、地图相框 + 点击放大、通关金徽章 + 100% 证书、抽屉进度、页脚统计胶囊 + 缓存 + 数字滚动、墨青主题、暗色补齐。
+- **开学季防骗弹窗 + 防骗模块扩充（2026-09，用户批准的追加改动）**：①新增 `#scam-pop` 弹窗（每次加载弹、4 种关闭方式、主按钮跳 `#scam`、朱印红警示样式、暗色/响应式/打印/reduced-motion 全覆盖）；②`#scam` 模块新增两条骗局卡——「🖊️ 宿舍高价卖笔（"学长学姐实习冲业绩"）」「💬 假"表白墙"加好友（其实是广告号）」，并把「📶 电话卡/办卡推销」改写为「假"必须激活卡"（流量卡冒充校园卡）」、「🚪 宿舍上门推销」补充高价卖笔话术；③官方安全提示补第 6 条"办卡/激活"事实（校园一卡通由学院发放、卡务中心充值；"激活"只指网办大厅与企业微信，入口在学校官网）——**依据官方入学指南原文（素材文件第 101–103 行），未编造政策**。
 - **全站文案优化轮（2026-09，用户批准的例外改动）**：①硬伤修复——「三不一核实」（原写四不实际三不）、通关证书文案与触发条件对齐（只提"行囊备齐"不再声称"读完全部模块"）、Hero 统计卡补量词"所"、食堂"饭卡/一卡通"口径澄清；②长句拆分——线上选宿舍、医保待遇等待期、入学体检、组织关系转接、转专业申请时间、卓越班区分等 110+ 字长 li 全部拆短；③去重——报到时间线（li 与 tip 二处合一）、军训正文 URL（与来源折叠区重复，已删正文侧）、快递/行李邮寄两段重复（保留宿舍侧完整版）；④风格统一——日期区间统一用「—」、宿舍房型卡标题补 emoji、小标题顺句。**事实、数字、链接、来源标注零增删**（正文 URL 47→45 仅删重复项，折叠区仍保留）。
 
 **待办/可选方向（用户点名再做）**
 - 各模块"分享本模块"（锚点链接）
 - 字体自托管（需要子集化工具）
-- CSS 重构合并（当前 1520 行含多层追加，功能正常但维护成本高）
+- CSS 重构合并（当前 1678 行含多层追加，功能正常但维护成本高）
 - 访问统计明细（需换百度统计/友盟等注册制服务）
+- 弹窗频率记忆（"7 天一次"或"关闭后当天不再弹"，见上方限制说明）
 
 ## 14. 常用命令速查
 
@@ -281,4 +296,5 @@ curl.exe -s -o NUL -w '%{http_code}' https://xzt1118.github.io/xisu-guide-2026/ 
 5. 新增自定义 `display` 的可隐藏元素，记得处理 `[hidden]`（§11）。
 6. **抽屉变量名务必用 `nav`**，不要写成 `navEl`（§11）。
 7. 修改用户可见文案保持"学长学姐 + 闯关"口吻，标注来源。
-8. 每次改完：静态校验 → 推送 → 等 1 分钟 → curl/gh api 验证 → 告知用户"需要浏览器确认"的视觉点 → **同步更新本文档**。
+8. **弹窗类新增功能**：静态写 HTML + `hidden` + 内联 `display:none`，JS 里再移除；入场动画靠"下一帧加类"，关闭动画靠类 + `setTimeout` 收尾；主按钮若用锚点，**不要 `preventDefault`**（否则全站平滑滚动失效）。
+9. 每次改完：静态校验 → 推送 → 等 1 分钟 → curl/gh api 验证 → 告知用户"需要浏览器确认"的视觉点 → **同步更新本文档**。

@@ -1518,3 +1518,161 @@ html[data-theme="dark"] .cert-seal { color: #ff8195; border-color: rgba(255, 129
   .map-figure img { transition: none; }
   .map-figure img:hover { transform: none; }
 }
+
+/* ============================================================
+   2026 视觉升级（四）：开学季防骗提醒弹窗（#scam-pop）
+   朱印红警示 + 墨青文字 + 古金印章 kicker；动画只用 opacity/transform
+   ============================================================ */
+#scam-pop {
+  position: fixed;
+  inset: 0;
+  z-index: 420;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(15, 47, 56, .55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  animation: scamVeilIn .26s ease-out;
+}
+#scam-pop[hidden] { display: none; }
+
+.scam-pop-card {
+  position: relative;
+  width: min(100%, 620px);
+  /* auto 外边距：卡片高于视口时 flex 居中也不会裁掉顶部，改为可滚动 */
+  margin: auto;
+  max-height: min(88vh, 720px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg), inset 0 5px 0 var(--stamp);
+  padding: 30px 30px 26px;
+  animation: scamCardIn .3s cubic-bezier(.2, .9, .3, 1.15) both;
+}
+@keyframes scamVeilIn { from { opacity: 0; } }
+@keyframes scamCardIn { from { opacity: 0; transform: translateY(18px) scale(.96); } }
+#scam-pop.is-closing { animation: scamVeilOut .16s ease-in forwards; }
+#scam-pop.is-closing .scam-pop-card { animation: scamCardOut .16s ease-in forwards; }
+@keyframes scamVeilOut { to { opacity: 0; } }
+@keyframes scamCardOut { to { opacity: 0; transform: translateY(10px) scale(.98); } }
+
+.scam-pop-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--paper);
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: transform .15s, color .15s, border-color .15s;
+}
+.scam-pop-close .ic { width: 17px; height: 17px; }
+.scam-pop-close:hover { color: var(--stamp); border-color: var(--stamp); transform: rotate(90deg); }
+
+.scam-pop-kicker {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: var(--stamp);
+  background: linear-gradient(135deg, var(--gold), var(--gold-deep));
+  border: 1px solid rgba(224, 156, 20, .5);
+  border-radius: 8px;
+  padding: 4px 12px;
+  transform: rotate(-2deg);
+  box-shadow: 0 2px 6px rgba(224, 156, 20, .3);
+}
+.scam-pop-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 27px;
+  line-height: 1.35;
+  color: var(--red-dark);
+  margin: 14px 0 8px;
+}
+.scam-pop-lead { font-size: 14.5px; color: var(--ink-soft); }
+.scam-pop-list { margin: 16px 0 4px; }
+.scam-pop-list li {
+  position: relative;
+  padding: 10px 0 10px 16px;
+  border-top: 1px dashed var(--line);
+  font-size: 14.5px;
+  color: var(--ink);
+}
+.scam-pop-list li:first-child { border-top: none; }
+.scam-pop-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 19px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--stamp);
+}
+.scam-pop-list b { color: var(--stamp-deep); }
+
+.scam-pop-foot { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 20px; }
+.scam-pop-cta {
+  position: relative;
+  overflow: hidden;
+  color: #fff;
+  background: linear-gradient(135deg, var(--stamp), var(--stamp-deep));
+  box-shadow: 0 8px 22px rgba(200, 16, 46, .32);
+}
+.scam-pop-cta::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, .38), transparent 62%);
+  opacity: 0;
+  pointer-events: none;
+  animation: scamCtaPulse 2.6s ease-in-out infinite;
+}
+@keyframes scamCtaPulse { 0%, 100% { opacity: 0; } 50% { opacity: .55; } }
+.scam-pop-later {
+  background: var(--paper);
+  color: var(--ink-soft);
+  border: 1.5px solid var(--line);
+}
+.scam-pop-later:hover { color: var(--red-dark); border-color: var(--red); }
+.scam-pop-tip { margin-top: 16px; font-size: 12.5px; color: var(--ink-soft); line-height: 1.75; }
+.scam-pop-tip b { color: var(--stamp-deep); }
+
+html[data-theme="dark"] #scam-pop { background: rgba(0, 0, 0, .64); }
+html[data-theme="dark"] .scam-pop-card { border-color: #322a38; box-shadow: var(--shadow-lg), inset 0 5px 0 var(--stamp); }
+html[data-theme="dark"] .scam-pop-title { color: #7fc0d0; }
+html[data-theme="dark"] .scam-pop-kicker { color: #6f0a1a; }
+html[data-theme="dark"] .scam-pop-list b, html[data-theme="dark"] .scam-pop-tip b { color: #ff8195; }
+html[data-theme="dark"] .scam-pop-list li { border-top-color: #2a2e34; }
+html[data-theme="dark"] .scam-pop-close { background: #23272d; border-color: #3a4248; color: #9aa0a8; }
+html[data-theme="dark"] .scam-pop-later { background: #23272d; border-color: #3a4248; color: #cfc8d8; }
+
+@media (max-width: 520px) {
+  #scam-pop { padding: 14px; }
+  .scam-pop-card { padding: 26px 18px 22px; max-height: 90vh; }
+  .scam-pop-title { font-size: 22px; }
+  .scam-pop-lead, .scam-pop-list li { font-size: 14px; }
+  .scam-pop-foot { gap: 10px; }
+  .scam-pop-foot .btn { flex: 1 1 100%; justify-content: center; }
+}
+
+@media print { #scam-pop { display: none !important; } }
+
+@media (prefers-reduced-motion: reduce) {
+  #scam-pop, .scam-pop-card { animation: none !important; }
+  .scam-pop-cta::after { animation: none; }
+  .scam-pop-close { transition: none; }
+  .scam-pop-close:hover { transform: none; }
+}

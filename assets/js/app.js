@@ -264,6 +264,76 @@
     requestAnimationFrame(frame);
   }
 
+  /* ================= 开学季防骗提醒弹窗 =================
+     每次打开页面弹出（报到高峰期不记忆已读），4 种关闭方式：
+     × / 「我知道了」/ 点遮罩 / Esc；主按钮是 <a href="#scam">，走全站平滑滚动。 */
+  var scamPop = document.getElementById('scam-pop');
+  if (scamPop) {
+    var scamPopClose = document.getElementById('scam-pop-close');
+    var scamPopLater = document.getElementById('scam-pop-later');
+    var scamPopCta = document.getElementById('scam-pop-cta');
+    var scamPopClosing = false;
+    /* 初始化时记录 body 原始 overflow（弹窗关闭后原样恢复，不写死空值） */
+    var scamPopPrevOverflow = document.body.style.overflow;
+    var focusBeforePop = null;
+
+    function openScamPop() {
+      if (!scamPop.hidden) { return; } /* 已打开，避免重复触发入口动画 */
+      scamPop.style.display = '';
+      scamPop.hidden = false;
+      document.body.style.overflow = 'hidden';
+      /* 下一帧再加 .is-open，保证入场动画从初始态开始 */
+      if (window.requestAnimationFrame) {
+        window.requestAnimationFrame(function () { scamPop.classList.add('is-open'); });
+      } else {
+        scamPop.classList.add('is-open');
+      }
+      if (scamPopCta && scamPopCta.focus) {
+        focusBeforePop = document.activeElement;
+        try { scamPopCta.focus({ preventScroll: true }); } catch (e) { scamPopCta.focus(); }
+      }
+    }
+
+    function closeScamPop() {
+      if (scamPopClosing || scamPop.hidden) return;
+      scamPopClosing = true;
+      scamPop.classList.remove('is-open');
+      scamPop.classList.add('is-closing');
+      var finish = function () {
+        scamPop.classList.remove('is-closing');
+        scamPop.hidden = true;
+        scamPop.style.display = 'none';
+        document.body.style.overflow = scamPopPrevOverflow;
+        scamPopClosing = false;
+        /* 焦点回到弹窗打开前的位置，避免停留在已隐藏元素上 */
+        if (focusBeforePop && focusBeforePop.focus && focusBeforePop !== document.body) {
+          try { focusBeforePop.focus({ preventScroll: true }); } catch (e) {}
+        }
+      };
+      if (reduceMotion) finish();
+      else setTimeout(finish, 200);
+    }
+
+    function onScamPopKey(e) {
+      if (e.key === 'Escape' || e.key === 'Esc') closeScamPop();
+    }
+
+    if (scamPopClose) scamPopClose.addEventListener('click', closeScamPop);
+    if (scamPopLater) scamPopLater.addEventListener('click', closeScamPop);
+    if (scamPopCta) scamPopCta.addEventListener('click', closeScamPop);
+    scamPop.addEventListener('click', function (e) {
+      if (e.target === scamPop) closeScamPop();
+    });
+    document.addEventListener('keydown', onScamPopKey);
+
+    /* 延迟到首帧之后再弹，避开 Hero 逐字动画/数字滚动，也避免打断首屏阅读 */
+    if (window.requestAnimationFrame) {
+      window.requestAnimationFrame(function () { setTimeout(openScamPop, 350); });
+    } else {
+      setTimeout(openScamPop, 350);
+    }
+  }
+
   /* ================= 开学必备清单 ================= */
   var STORAGE_KEY = 'xisu2026-checklist-v1';
 
